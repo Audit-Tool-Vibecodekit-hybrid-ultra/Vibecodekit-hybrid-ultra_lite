@@ -157,7 +157,8 @@ def _cmd_install(args: argparse.Namespace) -> int:
     # a misconfigured path (read-only dir, file-where-dir-expected,
     # stale mount, etc.).
     try:
-        out = install_manifest.install(args.destination, dry_run=args.dry_run)
+        out = install_manifest.install(args.destination, dry_run=args.dry_run,
+                                       lite=getattr(args, "lite", False))
     except (PermissionError, FileExistsError,
             IsADirectoryError, NotADirectoryError) as e:
         print(json.dumps({
@@ -896,6 +897,8 @@ def main(argv=None) -> int:
         elif cmd_name == "install":
             sub.add_argument("destination")
             sub.add_argument("--dry-run", action="store_true")
+            sub.add_argument("--lite", action="store_true",
+                             help="Install in lite mode (10 core commands only).")
             sub.set_defaults(fn=_cmd_install)
         elif cmd_name == "discover":
             sub.add_argument("--touched", default=None)
