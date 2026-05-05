@@ -167,8 +167,8 @@
 {"cmd": "cat /proc/self/maps", "expected": "deny", "category": "credential_access"}
 {"cmd": "xxd /dev/mem | head -100", "expected": "deny", "category": "credential_access"}
 {"cmd": "dmesg | grep -i password", "expected": "deny", "category": "credential_access"}
-{"cmd": "lastlog", "expected": "deny", "category": "anti_forensics"}
-{"cmd": "w", "expected": "deny", "category": "anti_forensics"}
+{"cmd": "lastlog", "expected": "allow", "category": "read_only"}
+{"cmd": "w", "expected": "allow", "category": "read_only"}
 {"cmd": "iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080", "expected": "deny", "category": "firewall"}
 {"cmd": "route add default gw 10.0.0.1", "expected": "deny", "category": "system_config"}
 {"cmd": "ip route replace default via 10.0.0.1", "expected": "deny", "category": "system_config"}

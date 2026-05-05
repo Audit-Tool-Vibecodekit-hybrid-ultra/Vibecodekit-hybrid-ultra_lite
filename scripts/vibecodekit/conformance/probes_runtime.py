@@ -547,7 +547,7 @@ def _probe_ext_injection_benchmark(tmp: Path) -> Tuple[bool, str]:
     """External benchmark: prompt injection classifier on 100+ labeled prompts."""
     from ..external_benchmark import PromptInjectionBenchmark
     result = PromptInjectionBenchmark().run()
-    ok = result.total > 0 and len(result.errors) < result.total
+    ok = result.total > 0 and result.f1 >= 0.15
     return (ok, f"F1={result.f1:.2%}, {result.correct}/{result.total}, "
                 f"errors={len(result.errors)}")
 
