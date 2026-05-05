@@ -105,12 +105,25 @@ class PermissionBenchmark:
             return BenchmarkResult("permission", 0, 0, 0.0, 0.0, 0.0,
                                    [{"error": f"dataset not found: {self.DATASET}"}])
 
+        # Reset denial fatigue circuit breaker so each command is evaluated
+        # independently.  Without this, the circuit breaker trips after 3
+        # consecutive denials and converts subsequent deny → ask, causing
+        # false negatives in the benchmark.
+        denial_path = Path("/tmp") / ".vibecode" / "runtime" / "denials.json"
+        if denial_path.exists():
+            denial_path.unlink()
+
         tp = fp = fn = tn = 0
         errors: List[Dict[str, Any]] = []
 
         for entry in data:
             cmd = entry["cmd"]
             expected = entry["expected"]  # "deny" or "allow"
+
+            # Reset denial store before each command to prevent circuit
+            # breaker from accumulating state across benchmark entries.
+            if denial_path.exists():
+                denial_path.unlink()
 
             try:
                 result = permission_engine.decide_typed(cmd, mode="default", root="/tmp")

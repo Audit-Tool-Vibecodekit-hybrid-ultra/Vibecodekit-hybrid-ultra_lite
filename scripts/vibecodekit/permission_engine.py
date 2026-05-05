@@ -282,6 +282,126 @@ _DANGEROUS_PATTERNS: List[Tuple[str, str]] = [
     (r"\buv\s+(pip\s+install|pip\s+uninstall|add|remove|sync)\b", "uv pip install/uninstall"),
     (r"\bpoetry\s+(add|remove|install|update)\b", "poetry install/uninstall"),
     (r"\bconda\s+(install|remove|update)\b", "conda install/uninstall"),
+    # -- v0.23.0 — 55 false-negative fix: 12 missing attack categories --------
+    # (19) Disk destruction: wipefs, hdparm, badblocks write-mode.
+    (r"(^|[\s;&|`])wipefs\b", "wipefs disk signature wipe"),
+    (r"(^|[\s;&|`])badblocks\s+[^\n]*-[a-zA-Z]*w", "badblocks destructive write test"),
+    (r"(^|[\s;&|`])hdparm\s+[^\n]*--security-erase", "hdparm security erase"),
+    (r"(^|[\s;&|`])(reboot|poweroff|halt)\s+(-f|--force)\b", "forced reboot/poweroff"),
+    # (20) Fork bombs / resource exhaustion.
+    (r"\bperl\s+-e\b[^\n]*\bfork\b[^\n]*\bfork\b", "Perl fork bomb"),
+    (r"\bpython3?\s+-c\b[^\n]*\bos\.fork\b", "Python fork bomb"),
+    (r"\bfork\s+while\s+fork\b", "fork bomb pattern"),
+    # (21) Network scanning / traffic capture.
+    (r"(^|[\s;&|`])nmap\b", "nmap network scan"),
+    (r"(^|[\s;&|`])masscan\b", "masscan aggressive network scan"),
+    (r"(^|[\s;&|`])arp-scan\b", "arp-scan network discovery"),
+    (r"(^|[\s;&|`])tcpdump\b", "tcpdump traffic capture"),
+    # (22) Credential / sensitive file access.
+    (r"(^|[\s;&|`<>])(cat|head|tail|less|more|strings|xxd|hexdump)\s+[^\n]*~?/?\.(gnupg|config/gcloud)/",
+     "read credential store"),
+    (r"(^|[\s;&|`<>])(cat|strings|xxd)\s+[^\n]*/proc/[0-9]+/environ\b",
+     "read process environment (credential exposure)"),
+    (r"(^|[\s;&|`<>])(cat|strings|xxd)\s+[^\n]*/proc/self/(environ|maps)\b",
+     "read /proc/self sensitive file"),
+    (r"(^|[\s;&|`<>])xxd\s+[^\n]*/dev/mem\b",
+     "read raw memory via xxd"),
+    (r"\b(env|printenv)\s*\|\s*grep\s+(-i\s+)?(secret|key|password|token|credential)\b",
+     "grep environment for secrets"),
+    (r"\bfind\s+[^\n]*-name\s+['\"]?\*\.(pem|key|p12|pfx|jks)\b[^\n]*-exec\s+(cat|cp|scp|rsync)\b",
+     "find certificate/key files and read/copy"),
+    (r"\bdmesg\b[^\n]*grep\s+(-i\s+)?(password|secret|key|token)\b",
+     "dmesg grep for secrets"),
+    # (23) Log tampering / anti-forensics.
+    (r"(^|[\s;&|`])truncate\s+(-s\s+0\s+)?[^\n]*/var/log/",
+     "truncate system logs"),
+    (r"(^|[\s;&|`])journalctl\s+--vacuum-(size|time)=0\b",
+     "journalctl vacuum to zero"),
+    (r"(^|[\s;&|`])rm\s+(-f\s+)?[^\n]*/var/log/[a-z]",
+     "delete system log files"),
+    # (24) Git destructive operations (beyond push/reset already covered).
+    (r"\bgit\s+checkout\s+--\s+\.\s*$",
+     "git checkout -- . (discard all changes)"),
+    (r"\bgit\s+branch\s+-D\s+(main|master|develop)\b",
+     "git delete protected branch"),
+    (r"\bgit\s+stash\s+drop\b",
+     "git stash drop"),
+    # (25) System config / kernel parameter mutation.
+    (r"(^|[\s;&|`])sysctl\s+-w\b",
+     "sysctl kernel parameter write"),
+    (r"(^|[\s;&|`])modprobe\s+(-r|--remove)\b",
+     "modprobe remove kernel module"),
+    (r"(^|[\s;&|`])route\s+(add|del)\b",
+     "route table modification"),
+    (r"(^|[\s;&|`])ip\s+route\s+(add|replace|del)\b",
+     "ip route table modification"),
+    # (26) Exfiltration via archive + transfer.
+    (r"\btar\b[^\n]*(~/?\.(ssh|aws|gnupg)|/etc/)",
+     "tar archive of sensitive directory"),
+    (r"\b(scp|rsync)\b[^\n]*(~/?\.(ssh|aws|gnupg)|/etc/|/home/)[^\n]*@",
+     "scp/rsync exfil to remote"),
+    (r"\bpython3?\s+-m\s+http\.server\b[^\n]*--directory\s+(/etc|/root|/home|/var)(/|\s|$)",
+     "python http.server serving sensitive directory"),
+    # (27) Unicode / escape obfuscation.
+    (r"\$'(\\x[0-9a-fA-F]{2})+'",
+     "hex-escaped shell command obfuscation"),
+    (r"\$'(\\[0-7]{3})+'",
+     "octal-escaped shell command obfuscation"),
+    # (28) Container escape / privilege escalation.
+    (r"\bdocker\s+run\b[^\n]*--privileged\b",
+     "docker run --privileged (container escape risk)"),
+    (r"\bnsenter\b[^\n]*--target\s+1\b",
+     "nsenter into PID 1 namespace (host escape)"),
+    (r"(^|[\s;&|`])chroot\b",
+     "chroot (potential privilege escalation)"),
+    # (29) Process debugging / injection.
+    (r"(^|[\s;&|`])(strace|ltrace)\s+-p\b",
+     "attach debugger to running process"),
+    (r"(^|[\s;&|`])gdb\s+-p\b",
+     "gdb attach to running process"),
+    (r"\bkill\s+-9\s+-1\b",
+     "kill all processes (kill -9 -1)"),
+    # (30) AWK/SED dangerous system calls.
+    (r"\bawk\b[^\n]*\bsystem\s*\(",
+     "awk system() call"),
+    (r"\bsed\b[^\n]*-i\s+[^\n]*/etc/(ssh|pam|security|sudoers)",
+     "sed in-place edit of system config"),
+    # (31) Swap / DNS / network sabotage.
+    (r"(^|[\s;&|`])swapoff\s+-a\b",
+     "swapoff -a (disable all swap)"),
+    (r"\bln\s+(-sf?|--symbolic)\s+/dev/null\s+/etc/(resolv\.conf|hosts|hostname)\b",
+     "symlink /dev/null over critical config"),
+    # (32) Setuid chmod (privilege escalation).
+    (r"\bchmod\s+[0-7]*4[0-7]{3}\b",
+     "setuid chmod (privilege escalation)"),
+    (r"\bchmod\s+[ug]\+s\b",
+     "setuid/setgid chmod"),
+    # (33) Dangerous permission changes on root.
+    (r"\bchmod\s+(-R\s+)?[0-7]*777\s+/(\s|$)",
+     "world-writable chmod on /"),
+    (r"\bchown\s+(-R\s+)?[^\s]+\s+/(etc|var|usr|boot|sys|proc)(\s|/|$)",
+     "chown system directory"),
+    # (34) Cloud storage exfiltration.
+    (r"\baws\s+s3\s+cp\b[^\n]*s3://[^\s]+\s+/tmp/",
+     "aws s3 cp to /tmp (potential exfil staging)"),
+    (r"\bgsutil\s+cp\b[^\n]*gs://[^\s]+\s+/tmp/",
+     "gsutil cp to /tmp (potential exfil staging)"),
+    (r"\baz\s+storage\s+blob\s+download",
+     "azure blob download"),
+    (r"\brclone\s+(copy|sync|move)\b",
+     "rclone cloud data transfer"),
+    # (35) openssl network probe.
+    (r"\bopenssl\s+s_client\b[^\n]*-connect\b",
+     "openssl s_client network probe"),
+    # (36) grep/find searching for secrets in system directories.
+    (r"\bgrep\b[^\n]*(-r|-R|--recursive)[^\n]*(password|secret|token|key|credential)[^\n]*/etc/",
+     "recursive grep for secrets in /etc"),
+    # (37) ssh-keygen to suspicious locations (not user's own ~/.ssh).
+    (r"\bssh-keygen\b[^\n]*-f\s+/root/",
+     "ssh-keygen to /root (persistence risk)"),
+    # (38) zip/tar + curl/wget exfil pipeline (compound command).
+    (r"\b(zip|tar)\b[^\n]*/home/[^\n]*(&&|\|\|)[^\n]*\b(curl|wget|scp|rsync)\b",
+     "archive + exfil pipeline"),
 ]
 
 _COMPILED_DANGEROUS = [(re.compile(p), reason) for p, reason in _DANGEROUS_PATTERNS]
@@ -451,6 +571,38 @@ def _normalise_unicode(text: str) -> str:
     return stripped.translate(trans)
 
 
+# ---------------------------------------------------------------------------
+# Layer 4d — Safe-exception for standard package install (v0.23.0)
+# ---------------------------------------------------------------------------
+# ``npm install``, ``pip install -r requirements.txt``, ``yarn add react``
+# etc. are routine dev operations that should be treated as mutations (ask
+# the user) rather than blocked.  Without this, the _DANGEROUS_PATTERNS
+# entry for package management classifies them as ``blocked`` (auto-deny).
+
+_SAFE_PKG_INSTALL_RX = re.compile(
+    r"^\s*("
+    r"(npm|yarn|pnpm|bun)\s+(install|add|ci)(\s+[\w@/.^~><=*-]+)*"
+    r"|pip3?\s+install(\s+(-r|--requirement)\s+\S+|\s+[\w@/.^~><=*-]+)*"
+    r"|cargo\s+(build|add)(\s+[\w@/.^~><=*-]+)*"
+    r"|gem\s+install(\s+[\w@/.^~><=*-]+)*"
+    r"|poetry\s+(install|add)(\s+[\w@/.^~><=*-]+)*"
+    r"|uv\s+(sync|pip\s+install)(\s+[\w@/.^~><=*-]+)*"
+    r"|conda\s+install(\s+[\w@/.^~><=*-]+)*"
+    r"|pipx\s+install(\s+[\w@/.^~><=*-]+)*"
+    r"|ssh-keygen\s+(-[tCNqb]\s+\S+\s+)*(-f\s+~/\.ssh/\S+\s*)?(-[tCNqb]\s+\S+\s*)*"
+    r")\s*$",
+    re.IGNORECASE,
+)
+
+
+def _is_safe_pkg_install(cmd: str) -> bool:
+    """True if *cmd* is a straightforward package install / key generation."""
+    # Reject anything with shell metacharacters that could smuggle commands.
+    if any(c in cmd for c in ";|&`$(<>"):
+        return False
+    return bool(_SAFE_PKG_INSTALL_RX.match(cmd.strip()))
+
+
 def classify_cmd(cmd: str) -> Tuple[ClassName, str]:
     """Return ``(class, reason)`` for a shell command.
 
@@ -461,6 +613,10 @@ def classify_cmd(cmd: str) -> Tuple[ClassName, str]:
     text = _normalise_unicode(cmd).strip()
     if not text:
         return "blocked", "empty command"
+
+    # Layer 4d — Safe-exception for standard package install (v0.23.0).
+    if _is_safe_pkg_install(text):
+        return "mutation", "safe package install"
 
     # Layer 4c — Safe-exception cho rm -rf build artifact (PR4).
     # Phải chạy trước Layer 4 để bypass ``destructive recursive delete``.
