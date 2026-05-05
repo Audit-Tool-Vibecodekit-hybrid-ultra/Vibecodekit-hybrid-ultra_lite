@@ -13,8 +13,6 @@ The runner is **agnostic** to where probes come from.  Callers may pass
 their own ``probes`` list (used by the back-compat shim in
 ``conformance_audit.py``) or omit it, in which case the runner pulls
 from ``vibecodekit.conformance_audit.PROBES`` for full back-compat.
-Once PR β-6 lands, callers can also pass ``probes=collect_registered()``
-to use the decorator-based registry.
 """
 from __future__ import annotations
 
@@ -30,7 +28,8 @@ ProbeEntry = Tuple[str, ProbeFn]
 
 
 def audit(threshold: float = 0.85, *,
-          probes: Optional[Sequence[ProbeEntry]] = None) -> Dict[str, Any]:
+          probes: Optional[Sequence[ProbeEntry]] = None,
+          skip_standalone: bool = False) -> Dict[str, Any]:
     """Run all probes against fresh temp dirs, return parity report.
 
     Parameters
@@ -42,6 +41,12 @@ def audit(threshold: float = 0.85, *,
         Optional list of ``(id, fn)`` pairs.  If ``None`` (default)
         the runner pulls ``PROBES`` from ``vibecodekit.conformance_audit``
         — preserving v0.22.x behaviour exactly.
+    skip_standalone:
+        If ``True``, exclude probes marked ``standalone=True`` in the
+        registry.  Only effective when ``probes`` is ``None`` (i.e. the
+        runner collects from the registry).  Standalone probes exercise
+        demo-only code (query_loop, recovery_engine) that does not run
+        in production Claude Code context.
 
     Returns
     -------
@@ -49,15 +54,15 @@ def audit(threshold: float = 0.85, *,
     ``met``, and ``probes`` (a list of per-probe rows).
     """
     if probes is None:
-        # PR β-6: source of truth is the ``@probe`` decorator-based
-        # registry, but we read it via ``vibecodekit.conformance_audit
-        # .PROBES`` so test code that monkey-patches that attribute
-        # (e.g. ``monkeypatch.setattr(ca, "PROBES", custom)``) still
-        # influences the runner.  Importing the audit shim is what
-        # populates the registry as a side effect — each ``@probe``
-        # decorator runs at module-load time.
-        from vibecodekit.conformance_audit import PROBES as _DEFAULT_PROBES
-        probes = _DEFAULT_PROBES
+        if skip_standalone:
+            from ._registry import collect_registered
+            probes = sorted(
+                collect_registered(skip_standalone=True),
+                key=lambda row: row[0],
+            )
+        else:
+            from vibecodekit.conformance_audit import PROBES as _DEFAULT_PROBES
+            probes = _DEFAULT_PROBES
 
     rows: List[Dict[str, Any]] = []
     with tempfile.TemporaryDirectory() as td:
@@ -82,6 +87,7 @@ def audit(threshold: float = 0.85, *,
         "total": total,
         "parity": round(parity, 4),
         "met": parity >= threshold,
+        "skip_standalone": skip_standalone,
         "probes": rows,
     }
 
@@ -93,8 +99,11 @@ def main() -> None:
     )
     ap.add_argument("--threshold", type=float, default=0.85)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--skip-standalone", action="store_true",
+                    help="Skip probes that exercise standalone/demo-only code "
+                         "(query_loop, recovery_engine).")
     args = ap.parse_args()
-    out = audit(args.threshold)
+    out = audit(args.threshold, skip_standalone=args.skip_standalone)
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     else:

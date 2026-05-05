@@ -93,6 +93,41 @@ Bạn sẽ thấy ngay 42 slash command mới (25 `/vibe-*` + 1 master `/vibe` +
 
 ---
 
+## Con đường D — Lite mode (v0.26.0, 5 phút)
+
+Chạy chỉ **10 command** cốt lõi thay vì 42 — dành cho personal/solo
+project khi 42 command là quá tải.
+
+```bash
+# 1. Giải nén update-package vào thư mục dự án
+cd <my-project>
+unzip ~/Downloads/vibecodekit-hybrid-ultra-vX.Y.Z-update-package.zip -d .
+
+# 2. Bật lite mode
+export VIBECODEKIT_MODE=lite
+
+# 3. Hoặc cài qua CLI với flag --lite
+PYTHONPATH=scripts python -m vibecodekit.cli install <destination> --lite
+
+# 4. Bắt đầu pipeline 6 bước
+/vibe-scan          # bước 1: khảo sát repo
+/vibe-rri           # bước 2: phỏng vấn ngược yêu cầu
+/vibe-vision        # bước 3: tầm nhìn + KPI
+/vibe-blueprint     # bước 4: kiến trúc
+/vibe-scaffold      # bước 5: tạo starter project
+/vibe-verify        # bước 6: QA gate + completion + refine
+```
+
+**10 command lite:**
+`/vibe` (router), `/vibe-scan`, `/vibe-rri`, `/vibe-vision`,
+`/vibe-blueprint`, `/vibe-scaffold`, `/vibe-verify`, `/vibe-permission`,
+`/vibe-doctor`, `/vibe-install`
+
+Muốn quay về full mode: `unset VIBECODEKIT_MODE` hoặc xóa
+`.vibecode/runtime/mode`.
+
+---
+
 ## Kiểm chứng bộ kit hoạt động đúng
 
 ```bash

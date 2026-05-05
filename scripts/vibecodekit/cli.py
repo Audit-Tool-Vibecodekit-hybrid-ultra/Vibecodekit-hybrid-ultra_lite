@@ -24,14 +24,20 @@ from pathlib import Path
 from . import (
     approval_contract, compaction, conformance_audit, cost_ledger, dashboard,
     doctor, install_manifest, mcp_client, memory_hierarchy, methodology,
-    permission_engine, query_loop, skill_discovery, subagent_runtime,
+    permission_engine, skill_discovery, subagent_runtime,
     task_runtime,
 )
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
+    """[DEMO] Run a plan through the standalone query loop.
+
+    This command is for demo / testing only — in production Claude Code
+    context, the host agent provides its own query loop.
+    """
+    from ._standalone.query_loop import run_plan
     plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
-    out = query_loop.run_plan(plan, root=args.root, mode=args.mode)
+    out = run_plan(plan, root=args.root, mode=args.mode)
     print(json.dumps({"session_id": out["session_id"], "event_log": out["event_log"],
                       "stop_reason": out["stop_reason"]}, indent=2))
     return 0 if out["stop_reason"] != "terminal_error" else 1
@@ -700,6 +706,23 @@ def _cmd_refine(args: argparse.Namespace) -> int:
     raise SystemExit(f"unknown refine command: {args.refine_cmd}")
 
 
+def _cmd_benchmark(args: argparse.Namespace) -> int:
+    """Run external validation benchmarks against real datasets."""
+    from .external_benchmark import run_all
+    names = [args.benchmark] if args.benchmark else None
+    report = run_all(names)
+    if getattr(args, "json", False):
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        for r in report["benchmarks"]:
+            status = "PASS" if r["f1"] >= 0.90 else "FAIL"
+            print(f"  [{status}] {r['name']:<12} "
+                  f"F1={r['f1']:.2%}  P={r['precision']:.2%}  R={r['recall']:.2%}  "
+                  f"({r['correct']}/{r['total']})")
+        print(f"\nOverall: {'ALL PASS' if report['all_passing'] else 'SOME FAIL'}")
+    return 0 if report["all_passing"] else 1
+
+
 def _cmd_demo(args: argparse.Namespace) -> int:
     """Run a self-contained demo showcasing core capabilities.
 
@@ -817,16 +840,17 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="vibe")
     sp = ap.add_subparsers(dest="cmd", required=True)
 
-    for cmd_name in ("run", "doctor", "dashboard", "audit",
+    for cmd_name in ("run", "demo-run", "doctor", "dashboard", "audit",
                      "permission", "install", "discover", "subagent", "compact",
                      "task", "mcp", "ledger", "memory", "approval",
                      "rri-t", "rri-ux", "vn-check", "config", "intent",
                      "scaffold", "ship", "manifest", "refine", "verify",
                      "anti-patterns", "module", "context", "activate",
-                     "team", "learn", "pipeline", "verb", "demo"):
+                     "team", "learn", "pipeline", "verb", "demo",
+                     "benchmark"):
         sub = sp.add_parser(cmd_name)
         sub.add_argument("--root", default=".")
-        if cmd_name == "run":
+        if cmd_name in ("run", "demo-run"):
             sub.add_argument("plan")
             sub.add_argument("--mode", default="default")
             sub.set_defaults(fn=_cmd_run)
@@ -1152,6 +1176,13 @@ def main(argv=None) -> int:
             sub.set_defaults(fn=_cmd_verb)
         elif cmd_name == "demo":
             sub.set_defaults(fn=_cmd_demo)
+        elif cmd_name == "benchmark":
+            sub.add_argument("--benchmark",
+                             choices=["permission", "injection", "scaffold", "intent"],
+                             default=None,
+                             help="Run a specific benchmark (default: all).")
+            sub.add_argument("--json", action="store_true")
+            sub.set_defaults(fn=_cmd_benchmark)
 
     ns = ap.parse_args(argv)
     return ns.fn(ns)

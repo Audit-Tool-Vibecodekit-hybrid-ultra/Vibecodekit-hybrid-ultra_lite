@@ -30,6 +30,26 @@ backward-compatible — power users can keep using them directly.
 /vibe tư vấn kiến trúc microservices
 ```
 
+## Lite mode (v0.26.0)
+
+If `VIBECODEKIT_MODE=lite` is set in the environment (or
+`.vibecode/runtime/mode` contains `lite`), only the **10 core
+commands** are available:
+
+`/vibe`, `/vibe-scan`, `/vibe-rri`, `/vibe-vision`, `/vibe-blueprint`,
+`/vibe-scaffold`, `/vibe-verify`, `/vibe-permission`, `/vibe-doctor`,
+`/vibe-install`
+
+In lite mode, route all prose to one of these 10 commands only.  If the
+user's request maps to a command outside the lite set, explain that they
+are in lite mode and suggest the closest lite-mode alternative (usually
+`/vibe-verify` which absorbs complete + refine functionality).
+
+Check lite mode:
+```bash
+PYTHONPATH=./scripts python -c "from vibecodekit.manifest_lite import is_lite; print(is_lite())"
+```
+
 ## How it routes — LLM-primary, Python fallback
 
 This command runs **on the host LLM (you)** — keep that in mind.  You
