@@ -9,11 +9,11 @@ exposes a sorted snapshot for back-compat.
 Public API
 ==========
 
-``@probe(id, *, group=..., since=..., standalone=...)``
+``@probe(id, *, group=..., since=..., standalone=..., legacy=...)``
     Decorator that appends ``(id, fn)`` to the global registry.  Use
     on a top-level function ``def fn(tmp: Path) -> tuple[bool, str]:``.
 
-``collect_registered(*, skip_standalone=False, groups=None) -> list[(id, fn)]``
+``collect_registered(*, skip_standalone=False, skip_legacy=False, groups=None) -> list[(id, fn)]``
     Snapshot the registry in registration order.  Used by the runner
     via ``conformance_audit.PROBES`` (which sorts the snapshot by
     probe-id so the audit output preserves v0.22.x ordering).
@@ -45,6 +45,7 @@ class ProbeMetadata:
     group: str
     since: Optional[str]
     standalone: bool
+    legacy: bool = False
 
 
 _REGISTRY: List[ProbeEntry] = []
@@ -53,7 +54,8 @@ _METADATA: List[ProbeMetadata] = []
 
 def probe(id: str, *, group: str = "uncategorised",
           since: Optional[str] = None,
-          standalone: bool = False) -> Callable[[ProbeFn], ProbeFn]:
+          standalone: bool = False,
+          legacy: bool = False) -> Callable[[ProbeFn], ProbeFn]:
     """Register a probe function in the global registry.
 
     Parameters
@@ -72,6 +74,10 @@ def probe(id: str, *, group: str = "uncategorised",
         If ``True``, this probe exercises standalone/demo-only code
         (query_loop, recovery_engine).  It can be skipped with
         ``--skip-standalone`` in production contexts.
+    legacy:
+        If ``True``, this probe is a tautological file-existence check
+        (Category B).  Excluded by default since v0.26.0; opt back in
+        with ``--legacy``.
 
     Returns
     -------
@@ -85,13 +91,14 @@ def probe(id: str, *, group: str = "uncategorised",
                     f"probe id collision: {id!r} already registered"
                 )
         _REGISTRY.append((id, fn))
-        _METADATA.append(ProbeMetadata(id=id, group=group, since=since, standalone=standalone))
+        _METADATA.append(ProbeMetadata(id=id, group=group, since=since, standalone=standalone, legacy=legacy))
         return fn
 
     return deco
 
 
 def collect_registered(*, skip_standalone: bool = False,
+                       skip_legacy: bool = False,
                        groups: Optional[Sequence[str]] = None) -> List[ProbeEntry]:
     """Return the registered probes, optionally filtering.
 
@@ -99,6 +106,8 @@ def collect_registered(*, skip_standalone: bool = False,
     ----------
     skip_standalone:
         If ``True``, exclude probes marked ``standalone=True``.
+    skip_legacy:
+        If ``True``, exclude probes marked ``legacy=True``.
     groups:
         If provided, only return probes whose ``group`` is in this set.
     """
@@ -106,6 +115,8 @@ def collect_registered(*, skip_standalone: bool = False,
     result: List[ProbeEntry] = []
     for entry, meta in zip(_REGISTRY, _METADATA):
         if skip_standalone and meta.standalone:
+            continue
+        if skip_legacy and meta.legacy:
             continue
         if allowed_groups is not None and meta.group not in allowed_groups:
             continue

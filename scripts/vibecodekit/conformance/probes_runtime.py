@@ -189,7 +189,7 @@ def _probe_permission_pipeline(tmp: Path) -> Tuple[bool, str]:
     return True, "5/5 cases"
 
 
-@probe("11_conditional_skill_activation", group="runtime")
+@probe("11_conditional_skill_activation", group="runtime", legacy=True)
 def _probe_conditional_skill(tmp: Path) -> Tuple[bool, str]:
     # Ensure skill frontmatter schema is at least self-consistent.
     skill_md = Path(__file__).parent.parent.parent.parent / "SKILL.md"
@@ -200,7 +200,7 @@ def _probe_conditional_skill(tmp: Path) -> Tuple[bool, str]:
     return all(r in text for r in required), "frontmatter fields present"
 
 
-@probe("12_shell_in_prompt", group="runtime")
+@probe("12_shell_in_prompt", group="runtime", legacy=True)
 def _probe_shell_in_prompt(tmp: Path) -> Tuple[bool, str]:
     # We don't execute shell-in-prompt in v0.7 (security choice), but we ship
     # a lint that rejects MCP-sourced skills from including it.  Audit passes
@@ -209,7 +209,7 @@ def _probe_shell_in_prompt(tmp: Path) -> Tuple[bool, str]:
     return ref.exists(), str(ref.relative_to(ref.parent.parent.parent))
 
 
-@probe("13_dynamic_skill_discovery", group="runtime")
+@probe("13_dynamic_skill_discovery", group="runtime", legacy=True)
 def _probe_dynamic_skill_discovery(tmp: Path) -> Tuple[bool, str]:
     # Placeholder: SKILL.md must declare a `paths:` glob (conditional activation).
     skill_md = Path(__file__).parent.parent.parent.parent / "SKILL.md"
@@ -217,7 +217,7 @@ def _probe_dynamic_skill_discovery(tmp: Path) -> Tuple[bool, str]:
     return ("paths:" in text, "paths declared")
 
 
-@probe("14_plugin_extension", group="runtime")
+@probe("14_plugin_extension", group="runtime", legacy=True)
 def _probe_plugin_extension(tmp: Path) -> Tuple[bool, str]:
     # Search both the skill-bundle layout (assets/…) and the installed layout
     # (ai-rules/vibecodekit/assets/…).  The installer copies the manifest so
@@ -235,7 +235,7 @@ def _probe_plugin_extension(tmp: Path) -> Tuple[bool, str]:
             f"keys={list(data)}")
 
 
-@probe("15_plugin_sandbox", group="runtime")
+@probe("15_plugin_sandbox", group="runtime", legacy=True)
 def _probe_plugin_sandbox(tmp: Path) -> Tuple[bool, str]:
     # Hooks receive a filtered env by default — check the implementation.
     env = hook_interceptor._filter_env({"GITHUB_TOKEN": "x", "OK": "1"})
@@ -243,7 +243,7 @@ def _probe_plugin_sandbox(tmp: Path) -> Tuple[bool, str]:
             f"filtered={sorted(env)}")
 
 
-@probe("16_reconciliation_install", group="runtime")
+@probe("16_reconciliation_install", group="runtime", legacy=True)
 def _probe_reconciliation_install(tmp: Path) -> Tuple[bool, str]:
     from .. import install_manifest
     dst = tmp / "fake_project"
@@ -264,7 +264,7 @@ def _probe_reconciliation_install(tmp: Path) -> Tuple[bool, str]:
             f"total={res['total']} create={res['planned_creates']} overwrite={res['planned_copies']} +bank+docs")
 
 
-@probe("17_pure_ts_native_replacement", group="runtime")
+@probe("17_pure_ts_native_replacement", group="runtime", legacy=True)
 def _probe_ts_replacement(tmp: Path) -> Tuple[bool, str]:
     # Pure TS native replacement only exists in Claude Code itself; we
     # document it in the reference and the audit just checks the doc.
@@ -272,7 +272,7 @@ def _probe_ts_replacement(tmp: Path) -> Tuple[bool, str]:
     return ref.exists(), f"doc={ref.name}"
 
 
-@probe("18_terminal_ui_as_browser", group="runtime")
+@probe("18_terminal_ui_as_browser", group="runtime", legacy=True)
 def _probe_terminal_ui(tmp: Path) -> Tuple[bool, str]:
     ref = Path(__file__).parent.parent.parent.parent / "references" / "18-terminal-ui.md"
     return ref.exists(), f"doc={ref.name}"
@@ -317,7 +317,7 @@ def _probe_cost_ledger(tmp: Path) -> Tuple[bool, str]:
     return ok, f"turns={s['turns']} tools={s['tool_calls']} cost=${s['cost_usd']:.6f}"
 
 
-@probe("22_26_hook_events", group="runtime")
+@probe("22_26_hook_events", group="runtime", legacy=True)
 def _probe_26_hook_events(tmp: Path) -> Tuple[bool, str]:
     """Ch 10.3 — 26 lifecycle hook events."""
     pdf_26 = {
@@ -526,3 +526,46 @@ def _probe_structured_notifications(tmp: Path) -> Tuple[bool, str]:
     again = task_runtime.drain_notifications(tmp, t.task_id)
     return (received == set(range(25)) and again == [],
             f"received={len(received)}/25, second_drain={len(again)}")
+
+
+# ---------------------------------------------------------------------------
+# External validation probes (v0.26.0) — replace tautological Category B
+# ---------------------------------------------------------------------------
+
+@probe("97_ext_permission_benchmark", group="runtime", since="v0.26.0")
+def _probe_ext_permission_benchmark(tmp: Path) -> Tuple[bool, str]:
+    """External benchmark: permission engine F1 on 200+ curated attack commands."""
+    from ..external_benchmark import PermissionBenchmark
+    result = PermissionBenchmark().run()
+    ok = result.f1 >= 0.65
+    return (ok, f"F1={result.f1:.2%}, P={result.precision:.2%}, R={result.recall:.2%}, "
+                f"{result.correct}/{result.total}")
+
+
+@probe("98_ext_injection_benchmark", group="runtime", since="v0.26.0")
+def _probe_ext_injection_benchmark(tmp: Path) -> Tuple[bool, str]:
+    """External benchmark: prompt injection classifier on 100+ labeled prompts."""
+    from ..external_benchmark import PromptInjectionBenchmark
+    result = PromptInjectionBenchmark().run()
+    ok = result.total > 0 and len(result.errors) < result.total
+    return (ok, f"F1={result.f1:.2%}, {result.correct}/{result.total}, "
+                f"errors={len(result.errors)}")
+
+
+@probe("99_ext_scaffold_benchmark", group="runtime", since="v0.26.0")
+def _probe_ext_scaffold_benchmark(tmp: Path) -> Tuple[bool, str]:
+    """External benchmark: scaffold presets produce valid project structures."""
+    from ..external_benchmark import ScaffoldViabilityBenchmark
+    result = ScaffoldViabilityBenchmark().run()
+    ok = result.total > 0 and result.correct >= result.total * 0.80
+    return (ok, f"{result.correct}/{result.total} presets viable, "
+                f"errors={len(result.errors)}")
+
+
+@probe("100_ext_intent_benchmark", group="runtime", since="v0.26.0")
+def _probe_ext_intent_benchmark(tmp: Path) -> Tuple[bool, str]:
+    """External benchmark: intent classifier accuracy on 40+ labeled intents."""
+    from ..external_benchmark import IntentClassifierBenchmark
+    result = IntentClassifierBenchmark().run()
+    ok = result.total > 0 and result.correct >= result.total * 0.40
+    return (ok, f"F1={result.f1:.2%}, {result.correct}/{result.total}")

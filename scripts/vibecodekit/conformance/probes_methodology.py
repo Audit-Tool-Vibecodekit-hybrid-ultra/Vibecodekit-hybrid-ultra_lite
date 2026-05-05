@@ -289,7 +289,7 @@ def _probe_verify_coverage(tmp: Path) -> Tuple[bool, str]:
     return True, "templates + evaluator OK"
 
 
-@probe("42_saas_anti_patterns_12", group="methodology")
+@probe("42_saas_anti_patterns_12", group="methodology", legacy=True)
 def _probe_anti_patterns(tmp: Path) -> Tuple[bool, str]:
     """RRI-UX § 10 — 12 SaaS anti-patterns enumerated + checklist evaluator."""
     here = Path(__file__).resolve().parents[3]
@@ -312,7 +312,7 @@ def _probe_anti_patterns(tmp: Path) -> Tuple[bool, str]:
     return True, "12/12 enumerated + evaluator OK"
 
 
-@probe("43_portfolio_saas_scaffolds", group="methodology")
+@probe("43_portfolio_saas_scaffolds", group="methodology", legacy=True)
 def _probe_portfolio_saas_scaffolds(tmp: Path) -> Tuple[bool, str]:
     """v5 Pattern E + Pattern B — portfolio + saas scaffold presets."""
     from .. import scaffold_engine
@@ -336,7 +336,7 @@ def _probe_portfolio_saas_scaffolds(tmp: Path) -> Tuple[bool, str]:
     return True, f"presets={sorted(names)}"
 
 
-@probe("44_enterprise_module_workflow", group="methodology")
+@probe("44_enterprise_module_workflow", group="methodology", legacy=True)
 def _probe_enterprise_module(tmp: Path) -> Tuple[bool, str]:
     """v5 Pattern F — `/vibe-module` workflow + probe + plan + refusal."""
     from .. import module_workflow
@@ -392,7 +392,7 @@ def _probe_methodology_commands(tmp: Path) -> Tuple[bool, str]:
     return (not missing, f"missing: {missing}" if missing else f"present={sorted(need)}")
 
 
-@probe("45_docs_scaffold_pattern_d", group="methodology")
+@probe("45_docs_scaffold_pattern_d", group="methodology", legacy=True)
 def _probe_docs_scaffold(tmp: Path) -> Tuple[bool, str]:
     """v0.11.1 / Pattern D — `docs` scaffold preset is registered + bootable."""
     from .. import scaffold_engine
@@ -410,7 +410,7 @@ def _probe_docs_scaffold(tmp: Path) -> Tuple[bool, str]:
     return True, f"docs preset OK ({len(plan.files)} files)"
 
 
-@probe("46_style_tokens_canonical", group="methodology")
+@probe("46_style_tokens_canonical", group="methodology", legacy=True)
 def _probe_style_tokens(tmp: Path) -> Tuple[bool, str]:
     """v0.11.2 / FIX-004 — references/34-style-tokens.md + FP/CP/VN sync."""
     from .. import methodology
@@ -438,7 +438,7 @@ def _probe_style_tokens(tmp: Path) -> Tuple[bool, str]:
     return True, "ref-34 + methodology in sync (FP=6, CP=6, VN=12)"
 
 
-@probe("47_rri_question_bank", group="methodology")
+@probe("47_rri_question_bank", group="methodology", legacy=True)
 def _probe_question_bank(tmp: Path) -> Tuple[bool, str]:
     """v0.11.2 / FIX-003 — bank meets thresholds × all personas × all modes."""
     from .. import methodology
@@ -477,7 +477,7 @@ def _probe_question_bank(tmp: Path) -> Tuple[bool, str]:
                   f"dev/GUIDED={len(saas_dev_guided)} q, all personas+modes valid)")
 
 
-@probe("48_copy_patterns_canonical", group="methodology")
+@probe("48_copy_patterns_canonical", group="methodology", legacy=True)
 def _probe_copy_patterns(tmp: Path) -> Tuple[bool, str]:
     """v0.11.2 / FIX-005 — references/36-copy-patterns.md + COPY_PATTERNS sync."""
     from .. import methodology
@@ -504,7 +504,7 @@ def _probe_copy_patterns(tmp: Path) -> Tuple[bool, str]:
     return True, "ref-36 + methodology in sync (CF=9, CF-VN=8)"
 
 
-@probe("49_stack_recommendations", group="methodology")
+@probe("49_stack_recommendations", group="methodology", legacy=True)
 def _probe_stack_recommendations(tmp: Path) -> Tuple[bool, str]:
     """v0.11.2 / FIX-002 — methodology.PROJECT_STACK_RECOMMENDATIONS coverage."""
     from .. import methodology
@@ -528,7 +528,7 @@ def _probe_stack_recommendations(tmp: Path) -> Tuple[bool, str]:
     return True, f"recommend_stack OK ({len(have)} canonical types + alias + safe fallback)"
 
 
-@probe("50_docs_intent_routing", group="methodology")
+@probe("50_docs_intent_routing", group="methodology", legacy=True)
 def _probe_docs_intent_routing(tmp: Path) -> Tuple[bool, str]:
     """v0.11.2 / FIX-001 — intent_router classifies docs prose to BUILD."""
     from .. import intent_router

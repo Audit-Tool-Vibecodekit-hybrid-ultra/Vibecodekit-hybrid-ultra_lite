@@ -171,7 +171,7 @@ def _probe_team_mode_required_gates(tmp: Path) -> Tuple[bool, str]:
     return True, "team mode write + enforce + clear ok"
 
 
-@probe("76_github_actions_ci", group="governance")
+@probe("76_github_actions_ci", group="governance", legacy=True)
 def _probe_github_actions_ci(tmp: Path) -> Tuple[bool, str]:
     """#76 — .github/workflows/ci.yml exists and declares pytest + audit gate."""
     for base in _candidate_repo_roots(tmp):
@@ -186,7 +186,7 @@ def _probe_github_actions_ci(tmp: Path) -> Tuple[bool, str]:
     return False, "no .github/workflows/ci.yml found in any candidate root"
 
 
-@probe("77_contributing_and_usage_guide", group="governance")
+@probe("77_contributing_and_usage_guide", group="governance", legacy=True)
 def _probe_contributing_and_usage_guide(tmp: Path) -> Tuple[bool, str]:
     """#77 — CONTRIBUTING.md + USAGE_GUIDE.md §17 browser section."""
     for base in _candidate_repo_roots(tmp):
@@ -638,7 +638,7 @@ def _probe_vck_cso_classifier_wired(tmp: Path) -> Tuple[bool, str]:
     return False, "no vck-cso.md found in any candidate root"
 
 
-@probe("88_case_study_otb_budget", group="governance")
+@probe("88_case_study_otb_budget", group="governance", legacy=True)
 def _probe_case_study_otb_budget(tmp: Path) -> Tuple[bool, str]:
     """#88 — Cycle 13 PR1: pre-baked case study `references/examples/
     01-otb-budget-module/` exists with 11 expected files, and both
@@ -682,7 +682,7 @@ def _probe_case_study_otb_budget(tmp: Path) -> Tuple[bool, str]:
                   f"rri_ux=PASS ({ru['summary']['flow']}/{ru['summary']['total']})")
 
 
-@probe("89_anti_patterns_gallery", group="governance")
+@probe("89_anti_patterns_gallery", group="governance", legacy=True)
 def _probe_anti_patterns_gallery_complete(tmp: Path) -> Tuple[bool, str]:
     """#89 — Cycle 13 PR2: anti-pattern gallery có entry cho cả 12
     canonical AP-XX với BAD/GOOD visualization + Fix recipe + Detector.
@@ -721,7 +721,7 @@ def _probe_anti_patterns_gallery_complete(tmp: Path) -> Tuple[bool, str]:
     return True, f"12/12 AP entries ok (viz+recipe+detector); api in sync"
 
 
-@probe("90_color_psychology_appendix", group="governance")
+@probe("90_color_psychology_appendix", group="governance", legacy=True)
 def _probe_color_psychology_appendix(tmp: Path) -> Tuple[bool, str]:
     """#90 — Cycle 13 PR3: ``references/37-color-psychology.md`` ship
     7 industry palette + WCAG section + Vietnamese cultural section
@@ -757,7 +757,7 @@ def _probe_color_psychology_appendix(tmp: Path) -> Tuple[bool, str]:
     return True, f"7 industries + WCAG + VN + CVD + dark-mode all present"
 
 
-@probe("91_font_pairing_appendix", group="governance")
+@probe("91_font_pairing_appendix", group="governance", legacy=True)
 def _probe_font_pairing_appendix(tmp: Path) -> Tuple[bool, str]:
     """#91 — Cycle 13 PR3: ``references/38-font-pairing.md`` ship 5
     canonical pairs + Vietnamese subset requirement + type-scale +
@@ -795,7 +795,7 @@ def _probe_font_pairing_appendix(tmp: Path) -> Tuple[bool, str]:
     return True, "5 pairs + 4 fonts + VN subset + scale + fallback all present"
 
 
-@probe("92_intent_routing_llm_primary_doc", group="governance")
+@probe("92_intent_routing_llm_primary_doc", group="governance", legacy=True)
 def _probe_intent_routing_llm_primary_doc(tmp: Path) -> Tuple[bool, str]:
     """Probe #92 — LLM-primary intent routing design log (v0.23.0).
 
@@ -922,7 +922,7 @@ _LOCKED_VCK_TOKENS = (
 )
 
 
-@probe("93_tailwind_prewire_design_tokens", group="governance")
+@probe("93_tailwind_prewire_design_tokens", group="governance", legacy=True)
 def _probe_tailwind_prewire_design_tokens(tmp: Path) -> Tuple[bool, str]:
     """#93 — cycle 15 PR-D1.
 
@@ -963,7 +963,7 @@ def _probe_tailwind_prewire_design_tokens(tmp: Path) -> Tuple[bool, str]:
     )
 
 
-@probe("94_design_tokens_files_shipped", group="governance")
+@probe("94_design_tokens_files_shipped", group="governance", legacy=True)
 def _probe_design_tokens_files_shipped(tmp: Path) -> Tuple[bool, str]:
     """#94 — cycle 15 PR-D2.
 
@@ -1029,7 +1029,7 @@ _SHADCN_SAMPLE_TARGETS = ("saas", "dashboard")
 _SHADCN_SAMPLE_COMPONENTS = ("button.tsx", "input.tsx", "card.tsx")
 
 
-@probe("95_shadcn_samples_ship", group="governance")
+@probe("95_shadcn_samples_ship", group="governance", legacy=True)
 def _probe_shadcn_samples_ship(tmp: Path) -> Tuple[bool, str]:
     """#95 — cycle 15 PR-D3.
 
@@ -1092,7 +1092,7 @@ _OSINT_TERMINAL_FILES = (
 )
 
 
-@probe("96_osint_terminal_scaffold_ship", group="governance")
+@probe("96_osint_terminal_scaffold_ship", group="governance", legacy=True)
 def _probe_osint_terminal_scaffold_ship(tmp: Path) -> Tuple[bool, str]:
     """#96 — cycle 16 PR-E1.
 
