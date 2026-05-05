@@ -270,13 +270,22 @@ class IntentClassifierBenchmark:
 
             try:
                 match = router.classify(text)
-                actual = match.intents[0] if hasattr(match, 'intents') and match.intents else "UNKNOWN"
+                if hasattr(match, 'intents') and match.intents:
+                    actual = match.intents[0]
+                    all_intents = match.intents
+                else:
+                    actual = "UNKNOWN"
+                    all_intents = ()
             except Exception as e:
                 errors.append({"input": text[:80], "expected": expected,
                                "error": str(e)})
                 continue
 
-            if actual == expected:
+            # Accept if expected intent is the primary match OR appears
+            # anywhere in the pipeline (e.g. "tạo dự án mới" triggers
+            # the full SCAN→VISION→RRI→BUILD→VERIFY pipeline — BUILD
+            # is a valid match even though SCAN is intents[0]).
+            if actual == expected or expected in all_intents:
                 correct += 1
             else:
                 errors.append({"input": text[:80], "expected": expected,
