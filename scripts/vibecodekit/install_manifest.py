@@ -165,7 +165,8 @@ def _install_lock(dst: Path) -> Iterator[None]:
                 _fcntl.flock(fh.fileno(), _fcntl.LOCK_UN)
 
 
-def install(dst_root: str | os.PathLike, *, dry_run: bool = False) -> Dict:
+def install(dst_root: str | os.PathLike, *, dry_run: bool = False,
+           lite: bool = False) -> Dict:
     dst = Path(dst_root).resolve()
     # v0.11.4 P3-1: serialise concurrent installers on the same dst so
     # re-planning always sees a committed filesystem view, not one mid-
@@ -184,10 +185,15 @@ def install(dst_root: str | os.PathLike, *, dry_run: bool = False) -> Dict:
                 s, d = Path(p.source), Path(p.destination)
                 d.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(s, d)
+    # v0.26.0: write lite-mode env marker so the overlay auto-detects mode.
+    if lite and not dry_run:
+        env_dir = dst / ".vibecode" / "runtime"
+        env_dir.mkdir(parents=True, exist_ok=True)
+        (env_dir / "mode").write_text("lite\n", encoding="utf-8")
     skipped = sum(1 for p in pl if p.action == "skip")
     planned_copies = sum(1 for p in pl if p.action == "overwrite")
     planned_creates = sum(1 for p in pl if p.action == "create")
-    return {"dry_run": dry_run, "total": len(pl),
+    return {"dry_run": dry_run, "lite": lite, "total": len(pl),
             "skipped": skipped, "planned_copies": planned_copies, "planned_creates": planned_creates,
             "operations": [{"source": p.source, "destination": p.destination, "action": p.action} for p in pl]}
 
@@ -196,9 +202,11 @@ def _main() -> None:
     ap = argparse.ArgumentParser(description="Reconciliation-based install into a target project.")
     ap.add_argument("destination")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--lite", action="store_true",
+                    help="Install in lite mode (10 core commands only).")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
-    out = install(args.destination, dry_run=args.dry_run)
+    out = install(args.destination, dry_run=args.dry_run, lite=args.lite)
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     else:

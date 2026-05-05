@@ -42,6 +42,11 @@ from .tool_schema_registry import partition_tool_blocks
 
 _log = get_logger("vibecodekit.tool_executor")
 
+# --- Public API ---
+# execute_blocks() is the ONLY production entry point, consumed by
+# subagent_runtime.py and conformance probes.  execute_one() is its
+# per-block helper.  Everything else is internal.
+__all__ = ["execute_blocks", "execute_one"]
 
 MAX_READ_BYTES = 200_000        # hard cap for read_file
 MAX_STDOUT_CHARS = 20_000       # cap for run_command outputs

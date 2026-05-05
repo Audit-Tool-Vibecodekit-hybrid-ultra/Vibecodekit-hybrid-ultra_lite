@@ -1,0 +1,40 @@
+{"input": "scan repo", "expected_intent": "SCAN"}
+{"input": "phân tích code", "expected_intent": "SCAN"}
+{"input": "xem cấu trúc dự án", "expected_intent": "SCAN"}
+{"input": "khảo sát repository", "expected_intent": "SCAN"}
+{"input": "explore the codebase", "expected_intent": "SCAN"}
+{"input": "define project vision", "expected_intent": "VISION"}
+{"input": "xem tầm nhìn", "expected_intent": "VISION"}
+{"input": "set goals and KPIs", "expected_intent": "VISION"}
+{"input": "reverse interview requirements", "expected_intent": "RRI"}
+{"input": "phỏng vấn ngược yêu cầu", "expected_intent": "RRI"}
+{"input": "hỏi nhu cầu stakeholder", "expected_intent": "RRI"}
+{"input": "gather requirements", "expected_intent": "RRI"}
+{"input": "scaffold project", "expected_intent": "BUILD"}
+{"input": "tạo dự án mới", "expected_intent": "BUILD"}
+{"input": "build landing page", "expected_intent": "BUILD"}
+{"input": "create starter project", "expected_intent": "BUILD"}
+{"input": "audit chất lượng code", "expected_intent": "VERIFY"}
+{"input": "verify quality gate", "expected_intent": "VERIFY"}
+{"input": "kiểm tra code", "expected_intent": "VERIFY"}
+{"input": "deploy to vercel", "expected_intent": "SHIP"}
+{"input": "lên production", "expected_intent": "SHIP"}
+{"input": "release to staging", "expected_intent": "SHIP"}
+{"input": "ship to production", "expected_intent": "SHIP"}
+{"input": "nâng cấp dependency", "expected_intent": "MAINTAIN"}
+{"input": "fix bug login", "expected_intent": "MAINTAIN"}
+{"input": "refactor module", "expected_intent": "MAINTAIN"}
+{"input": "tư vấn kiến trúc", "expected_intent": "ADVISOR"}
+{"input": "architecture advice", "expected_intent": "ADVISOR"}
+{"input": "health check", "expected_intent": "DOCTOR"}
+{"input": "kiểm tra overlay", "expected_intent": "DOCTOR"}
+{"input": "xem dashboard", "expected_intent": "DASHBOARD"}
+{"input": "event summary", "expected_intent": "DASHBOARD"}
+{"input": "update memory", "expected_intent": "MEMORY"}
+{"input": "ghi nhớ context", "expected_intent": "MEMORY"}
+{"input": "test matrix 7 dims", "expected_intent": "RRI-T"}
+{"input": "ma trận test", "expected_intent": "RRI-T"}
+{"input": "UX flow analysis", "expected_intent": "RRI-UX"}
+{"input": "luồng người dùng", "expected_intent": "RRI-UX"}
+{"input": "UI design system", "expected_intent": "RRI-UI"}
+{"input": "thiết kế giao diện", "expected_intent": "RRI-UI"}

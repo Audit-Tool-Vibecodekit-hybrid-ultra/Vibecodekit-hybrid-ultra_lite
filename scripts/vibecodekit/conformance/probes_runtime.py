@@ -69,14 +69,14 @@ from .. import (
 
 
 # Each probe returns (ok: bool, detail: str)
-@probe("01_async_generator_loop", group="runtime")
+@probe("01_async_generator_loop", group="runtime", standalone=True)
 def _probe_async_generator(tmp: Path) -> Tuple[bool, str]:
     plan = {"turns": [{"tool_uses": [{"tool": "list_files", "input": {"path": "."}}]}]}
     out = query_loop.run_plan(plan, root=str(tmp))
     return (out["stop_reason"] == "plan_exhausted", f"stop={out['stop_reason']}")
 
 
-@probe("02_derived_needs_follow_up", group="runtime")
+@probe("02_derived_needs_follow_up", group="runtime", standalone=True)
 def _probe_derived_follow_up(tmp: Path) -> Tuple[bool, str]:
     plan = {"turns": [
         {"tool_uses": [{"tool": "read_file", "input": {"path": "does_not_exist.txt"}}]},
@@ -90,7 +90,7 @@ def _probe_derived_follow_up(tmp: Path) -> Tuple[bool, str]:
             f"follow_ups={follow_ups}")
 
 
-@probe("03_escalating_recovery", group="runtime")
+@probe("03_escalating_recovery", group="runtime", standalone=True)
 def _probe_escalating_recovery(tmp: Path) -> Tuple[bool, str]:
     ledger = recovery_engine.RecoveryLedger()
     actions = [ledger.escalate("tool_failed")["action"] for _ in range(len(recovery_engine.LEVELS))]
@@ -335,7 +335,7 @@ def _probe_26_hook_events(tmp: Path) -> Tuple[bool, str]:
     return (not missing, f"covered={len(pdf_26 - missing)}/{len(pdf_26)}")
 
 
-@probe("23_follow_up_reexecute", group="runtime")
+@probe("23_follow_up_reexecute", group="runtime", standalone=True)
 def _probe_follow_up_reexecute(tmp: Path) -> Tuple[bool, str]:
     """Ch 3.6 / Pattern #2 — derived needs_follow_up should now actually
     re-execute the turn when recovery asks for retry."""
