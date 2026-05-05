@@ -7,6 +7,9 @@ wired_refs: [ref-30, ref-36]
 
 # /vibe-refine
 
+> **Lite mode (v0.26.0):** This command is merged into `/vibe-verify`.
+> Run `/vibe-verify --full` to include completion report + refine steps.
+
 REFINE is BƯỚC 8/8 of the v5 VIBECODE pipeline.  This command opens the
 refine ticket template and exposes the boundary classifier so you cannot
 accidentally smuggle a structural change (new route, dependency bump,

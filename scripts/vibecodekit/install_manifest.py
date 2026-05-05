@@ -165,6 +165,24 @@ def _install_lock(dst: Path) -> Iterator[None]:
                 _fcntl.flock(fh.fileno(), _fcntl.LOCK_UN)
 
 
+def _plan_commands(dst: Path) -> List[Planned]:
+    """Plan slash-command markdown files from update-package/.claude/commands/.
+
+    v0.26.0: these files are now part of the install plan so that
+    ``--lite`` can selectively copy only the 10 core commands.
+    """
+    out: List[Planned] = []
+    src_cmds = SKILL_ROOT / "update-package" / ".claude" / "commands"
+    if not src_cmds.exists():
+        return out
+    for p in sorted(src_cmds.glob("*.md")):
+        rel_name = p.stem  # e.g. "vibe-scan"
+        d = dst / ".claude" / "commands" / p.name
+        action = "skip" if d.exists() and _sha(p) == _sha(d) else ("overwrite" if d.exists() else "create")
+        out.append(Planned(str(p), str(d), action))
+    return out
+
+
 def install(dst_root: str | os.PathLike, *, dry_run: bool = False,
            lite: bool = False) -> Dict:
     dst = Path(dst_root).resolve()
@@ -175,27 +193,40 @@ def install(dst_root: str | os.PathLike, *, dry_run: bool = False,
     # lock-file side effect when the user only wanted to preview.
     if dry_run:
         pl = plan(dst_root)
+        cmd_pl = _plan_commands(dst)
     else:
         dst.mkdir(parents=True, exist_ok=True)
         with _install_lock(dst):
             pl = plan(dst_root)
-            for p in pl:
+            cmd_pl = _plan_commands(dst)
+            # v0.26.0: in lite mode, only copy LITE_COMMANDS command files.
+            if lite:
+                from .manifest_lite import LITE_COMMANDS
+                cmd_pl = [p for p in cmd_pl
+                          if Path(p.source).stem in LITE_COMMANDS]
+            all_ops = pl + cmd_pl
+            for p in all_ops:
                 if p.action == "skip":
                     continue
                 s, d = Path(p.source), Path(p.destination)
                 d.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(s, d)
+    if lite and dry_run:
+        from .manifest_lite import LITE_COMMANDS
+        cmd_pl = [p for p in cmd_pl
+                  if Path(p.source).stem in LITE_COMMANDS]
+    all_ops = pl + cmd_pl
     # v0.26.0: write lite-mode env marker so the overlay auto-detects mode.
     if lite and not dry_run:
         env_dir = dst / ".vibecode" / "runtime"
         env_dir.mkdir(parents=True, exist_ok=True)
         (env_dir / "mode").write_text("lite\n", encoding="utf-8")
-    skipped = sum(1 for p in pl if p.action == "skip")
-    planned_copies = sum(1 for p in pl if p.action == "overwrite")
-    planned_creates = sum(1 for p in pl if p.action == "create")
-    return {"dry_run": dry_run, "lite": lite, "total": len(pl),
+    skipped = sum(1 for p in all_ops if p.action == "skip")
+    planned_copies = sum(1 for p in all_ops if p.action == "overwrite")
+    planned_creates = sum(1 for p in all_ops if p.action == "create")
+    return {"dry_run": dry_run, "lite": lite, "total": len(all_ops),
             "skipped": skipped, "planned_copies": planned_copies, "planned_creates": planned_creates,
-            "operations": [{"source": p.source, "destination": p.destination, "action": p.action} for p in pl]}
+            "operations": [{"source": p.source, "destination": p.destination, "action": p.action} for p in all_ops]}
 
 
 def _main() -> None:

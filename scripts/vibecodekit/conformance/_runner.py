@@ -26,10 +26,33 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 ProbeFn = Callable[[Path], Tuple[bool, str]]
 ProbeEntry = Tuple[str, ProbeFn]
 
+# Essential probes for lite-mode installations (~15 probes).
+# Covers: permission engine, context defense, recovery, session,
+# security classifier, config, install reconciliation, and health.
+LITE_PROBES = frozenset({
+    "05_streaming_tool_execution",
+    "06_context_modifier_chain",
+    "09_five_layer_context_defense",
+    "10_permission_classification",
+    "19_background_tasks",
+    "24_denial_concurrency_safe",
+    "38_config_persistence",
+    "51_command_context_wiring",
+    "52_command_agent_binding",
+    "68_classifier_ensemble_contract",
+    "69_classifier_regex_rule_bank",
+    "70_classifier_blocks_prompt_injection",
+    "71_classifier_blocks_secret_leak",
+    "80_session_ledger_module",
+    "85_no_orphan_module",
+})
+
 
 def audit(threshold: float = 0.85, *,
           probes: Optional[Sequence[ProbeEntry]] = None,
-          skip_standalone: bool = False) -> Dict[str, Any]:
+          skip_standalone: bool = False,
+          skip_legacy: bool = False,
+          lite: bool = False) -> Dict[str, Any]:
     """Run all probes against fresh temp dirs, return parity report.
 
     Parameters
@@ -47,6 +70,12 @@ def audit(threshold: float = 0.85, *,
         runner collects from the registry).  Standalone probes exercise
         demo-only code (query_loop, recovery_engine) that does not run
         in production Claude Code context.
+    skip_legacy:
+        If ``True``, exclude probes marked ``legacy=True`` (tautological
+        file-existence checks from Category B).  Default since v0.26.0.
+    lite:
+        If ``True``, run only the ``LITE_PROBES`` essential subset
+        (~15 probes) suitable for lite mode installations.
 
     Returns
     -------
@@ -54,12 +83,19 @@ def audit(threshold: float = 0.85, *,
     ``met``, and ``probes`` (a list of per-probe rows).
     """
     if probes is None:
-        if skip_standalone:
+        needs_filtering = skip_standalone or skip_legacy or lite
+        if needs_filtering:
             from ._registry import collect_registered
             probes = sorted(
-                collect_registered(skip_standalone=True),
+                collect_registered(
+                    skip_standalone=skip_standalone,
+                    skip_legacy=skip_legacy,
+                ),
                 key=lambda row: row[0],
             )
+            if lite:
+                probes = [(pid, fn) for pid, fn in probes
+                          if pid in LITE_PROBES]
         else:
             from vibecodekit.conformance_audit import PROBES as _DEFAULT_PROBES
             probes = _DEFAULT_PROBES
@@ -88,6 +124,8 @@ def audit(threshold: float = 0.85, *,
         "parity": round(parity, 4),
         "met": parity >= threshold,
         "skip_standalone": skip_standalone,
+        "skip_legacy": skip_legacy,
+        "lite": lite,
         "probes": rows,
     }
 
@@ -102,8 +140,17 @@ def main() -> None:
     ap.add_argument("--skip-standalone", action="store_true",
                     help="Skip probes that exercise standalone/demo-only code "
                          "(query_loop, recovery_engine).")
+    ap.add_argument("--skip-legacy", action="store_true",
+                    help="Skip legacy tautological probes (Category B file-exists "
+                         "checks).  Recommended for external-validation workflows.")
+    ap.add_argument("--legacy", action="store_true",
+                    help="Include legacy probes (overrides --skip-legacy).")
+    ap.add_argument("--lite", action="store_true",
+                    help="Run only the essential lite-mode probe subset (~15 probes).")
     args = ap.parse_args()
-    out = audit(args.threshold, skip_standalone=args.skip_standalone)
+    do_skip_legacy = args.skip_legacy and not args.legacy
+    out = audit(args.threshold, skip_standalone=args.skip_standalone,
+                skip_legacy=do_skip_legacy, lite=args.lite)
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     else:
