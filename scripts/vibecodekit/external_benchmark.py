@@ -201,16 +201,18 @@ class ScaffoldViabilityBenchmark:
 
     def run(self) -> BenchmarkResult:
         import tempfile
-        from . import scaffold_engine
+        from .scaffold_engine import ScaffoldEngine
 
-        presets = scaffold_engine.list_presets()
+        engine = ScaffoldEngine()
+        presets = engine.list_presets()
         correct = 0
         errors: List[Dict[str, Any]] = []
 
-        for preset_name in presets:
+        for preset_info in presets:
+            preset_name = preset_info.name
             try:
                 with tempfile.TemporaryDirectory() as td:
-                    scaffold_engine.scaffold(td, preset_name, stack="python")
+                    engine.apply(preset_name, td, stack="python")
                     # Check that at least one file was created
                     created = list(Path(td).rglob("*"))
                     files = [f for f in created if f.is_file()]
@@ -255,7 +257,7 @@ class IntentClassifierBenchmark:
 
             try:
                 match = router.classify(text)
-                actual = match.intent if match else "UNKNOWN"
+                actual = match.intents[0] if hasattr(match, 'intents') and match.intents else "UNKNOWN"
             except Exception as e:
                 errors.append({"input": text[:80], "expected": expected,
                                "error": str(e)})
