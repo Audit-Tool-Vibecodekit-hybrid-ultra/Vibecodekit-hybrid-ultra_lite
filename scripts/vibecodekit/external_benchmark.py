@@ -165,8 +165,8 @@ class PromptInjectionBenchmark:
             expected = entry["expected"]  # "blocked" or "safe"
 
             try:
-                result = security_classifier.classify(text)
-                is_blocked = result.get("blocked", False) if isinstance(result, dict) else False
+                result = security_classifier.classify_text(text)
+                is_blocked = result.verdict.decision == "deny" if hasattr(result, 'verdict') else False
                 actual = "blocked" if is_blocked else "safe"
             except Exception as e:
                 errors.append({"input": text[:80], "expected": expected,
@@ -212,7 +212,7 @@ class ScaffoldViabilityBenchmark:
             preset_name = preset_info.name
             try:
                 with tempfile.TemporaryDirectory() as td:
-                    engine.apply(preset_name, td, stack="python")
+                    engine.apply(preset_name, td, stack=preset_info.stacks[0])
                     # Check that at least one file was created
                     created = list(Path(td).rglob("*"))
                     files = [f for f in created if f.is_file()]
