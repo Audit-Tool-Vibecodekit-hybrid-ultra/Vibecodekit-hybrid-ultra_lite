@@ -81,30 +81,66 @@ TIER_1: tuple[tuple[str, tuple[str, ...]], ...] = (
         "bảo mật", "bao mat", "security",
         "kiểm tra bảo mật", "kiem tra bao mat",
         "security scan",
+        # v0.23.0 — expanded keyword coverage.
+        "phân tích code", "phan tich code",
+        "xem cấu trúc", "xem cau truc",
+        "cấu trúc dự án", "cau truc du an",
+        "khảo sát", "khao sat",
+        "khảo sát repository", "khao sat repository",
+        "explore", "explore codebase", "explore the codebase",
+        "analyze code", "analyze codebase",
+        "repo structure", "project structure",
+        "đọc code", "doc code", "read code",
+        "understand code", "hiểu code", "hieu code",
     )),
     ("VISION", (
         "vision", "tầm nhìn", "tam nhin",
         "design vision", "brand", "thương hiệu",
         "định hướng", "dinh huong",
         "concept", "ý tưởng", "y tuong",
+        # v0.23.0 — expanded.
+        "goals", "KPIs", "KPI", "set goals", "set KPIs",
+        "mục tiêu", "muc tieu", "đặt mục tiêu", "dat muc tieu",
+        "objectives", "objective", "targets",
     )),
     ("RRI", (
         "rri", "reverse interview", "phỏng vấn ngược",
         "phong van nguoc", "đặt câu hỏi ngược", "dat cau hoi nguoc",
         "verify requirement", "kiểm tra yêu cầu",
+        # v0.23.0 — expanded.
+        "gather requirements", "requirements gathering",
+        "nhu cầu stakeholder", "nhu cau stakeholder",
+        "hỏi nhu cầu", "hoi nhu cau",
+        "stakeholder needs", "stakeholder interview",
+        "requirement", "requirements",
+        "yêu cầu", "yeu cau",
+        "user story", "user stories",
     )),
     ("RRI-T", (
         "rri-t", "rri t", "testing matrix", "ma trận test",
         "ma tran test", "stress axis", "test scenarios",
+        # v0.23.0 — expanded + disambiguation.
+        "test matrix", "7 dims", "7 dimensions",
+        "7 chiều", "7 chieu",
+        "stress test matrix", "kịch bản test", "kich ban test",
     )),
     ("RRI-UX", (
         "rri-ux", "rri ux", "flow physics", "user flow",
         "luồng người dùng", "luong nguoi dung",
         "ux critique", "phê bình ux",
+        # v0.23.0 — expanded.
+        "UX flow", "UX analysis", "UX review",
+        "ux flow analysis", "flow analysis",
+        "user experience",
+        "trải nghiệm người dùng", "trai nghiem nguoi dung",
     )),
     ("RRI-UI", (
         "rri-ui", "rri ui", "ui design", "thiết kế ui",
         "thiet ke ui", "design system", "design tokens",
+        # v0.23.0 — expanded.
+        "thiết kế giao diện", "thiet ke giao dien",
+        "giao diện", "giao dien",
+        "interface design", "UI layout", "UI component",
     )),
     ("BUILD", (
         "build", "làm", "tạo", "scaffold", "khởi tạo",
@@ -113,7 +149,10 @@ TIER_1: tuple[tuple[str, tuple[str, ...]], ...] = (
         "new project", "dự án mới", "du an moi",
         # Preset names — keep all 11 in sync with assets/scaffolds/.
         "shop", "shop online", "landing", "landing page",
-        "blog", "crm", "dashboard",
+        "blog", "crm",
+        # NOTE: "dashboard" moved to DASHBOARD intent in v0.23.0.
+        # Use compound forms for BUILD scaffold instead.
+        "dashboard app", "dashboard scaffold", "create dashboard",
         "api", "api todo", "rest api", "todo api",
         "mobile", "mobile app", "app điện thoại", "app dien thoai",
         "react native", "expo",
@@ -153,6 +192,12 @@ TIER_1: tuple[tuple[str, tuple[str, ...]], ...] = (
         "go live", "launch", "lên sản phẩm", "len san pham",
         "đưa lên production", "vercel deploy", "docker deploy",
         "triển khai", "trien khai", "release", "phát hành", "phat hanh",
+        # v0.23.0 — expanded.
+        "lên production", "len production",
+        "production", "staging",
+        "push to prod", "go to production",
+        "đẩy lên prod", "day len prod",
+        "đưa lên server", "dua len server",
     )),
     ("MODULE", (
         # v5 Pattern F — add a module to an existing codebase.
@@ -204,10 +249,22 @@ TIER_1: tuple[tuple[str, tuple[str, ...]], ...] = (
         "tự kiểm tra", "tu kiem tra", "selfcheck",
         "self-check", "self check", "self check kit",
         "khám máy", "kham may",
+        # v0.23.0 — expanded + disambiguation from VERIFY.
+        "health check", "healthcheck",
+        "kiểm tra overlay", "kiem tra overlay",
+        "overlay check", "installation check",
+        "is it working", "hoạt động chưa", "hoat dong chua",
+        "cài đặt đúng chưa", "cai dat dung chua",
     )),
     ("DASHBOARD", (
         "dashboard", "bảng điều khiển", "bang dieu khien",
         "tổng quan", "tong quan", "metrics",
+        # v0.23.0 — expanded.
+        "event summary", "events summary",
+        "xem sự kiện", "xem su kien",
+        "today events", "today summary",
+        "session summary", "runtime events",
+        "xem dashboard", "xem bảng", "xem bang",
     )),
     # v0.12.0 — VCK-* gstack-inspired specialist intents.  Phrases below
     # are intentionally HIGH-SPECIFICITY so they do not conflict with the
@@ -480,6 +537,68 @@ def _normalise(text: str) -> str:
     return re.sub(r"\s+", " ", _strip_diacritics(text).lower()).strip()
 
 
+# ---------------------------------------------------------------------------
+# v0.23.0 — Disambiguation engine
+# ---------------------------------------------------------------------------
+# When multiple intents match via single-keyword overlap (e.g. "check" fires
+# both VERIFY and DOCTOR), the _disambiguate function resolves by:
+#   1. Giving bonus to intents that matched LONGER compound phrases
+#      (specificity wins: "health check" > "check")
+#   2. Penalising intents whose single-keyword match is subsumed by another
+#      intent's compound match (e.g. VERIFY matched "check" but DOCTOR
+#      matched "health check" — VERIFY gets penalised).
+
+# Map of (winning_intent, losing_intent, trigger_phrase) triples.
+# If the trigger appears in the normalised text, winning_intent gets a boost
+# and losing_intent gets a penalty.
+_DISAMBIG_RULES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+    # "health check" / "kiểm tra overlay" → DOCTOR not VERIFY
+    ("DOCTOR", "VERIFY", ("health check", "healthcheck",
+                          "kiem tra overlay", "overlay check",
+                          "installation check", "selfcheck",
+                          "self-check", "self check")),
+    # "test matrix" / "7 dims" → RRI-T not VERIFY
+    ("RRI-T", "VERIFY", ("test matrix", "testing matrix",
+                         "ma tran test", "7 dims", "7 dimensions",
+                         "stress axis", "test scenarios",
+                         "kich ban test")),
+    # "xem dashboard" / "event summary" → DASHBOARD not BUILD
+    ("DASHBOARD", "BUILD", ("xem dashboard", "event summary",
+                            "events summary", "today events",
+                            "session summary", "runtime events",
+                            "xem bang", "xem su kien")),
+    # "tạo dự án" / "build landing" → BUILD not SCAN
+    ("BUILD", "SCAN", ("tao du an", "du an moi", "new project",
+                       "build landing", "code app", "khoi tao",
+                       "create app", "scaffold")),
+)
+
+
+def _disambiguate(
+    scores: list[tuple[str, float, list[str]]],
+    text: str,
+) -> list[tuple[str, float, list[str]]]:
+    """Apply disambiguation rules to resolve intent conflicts."""
+    intent_map = {s[0]: i for i, s in enumerate(scores)}
+    adjusted = list(scores)  # mutable copy
+
+    for winner, loser, triggers in _DISAMBIG_RULES:
+        if winner not in intent_map or loser not in intent_map:
+            continue
+        for t in triggers:
+            if _normalise(t) in text:
+                wi = intent_map[winner]
+                li = intent_map[loser]
+                # Boost winner, penalise loser
+                w_intent, w_score, w_matches = adjusted[wi]
+                l_intent, l_score, l_matches = adjusted[li]
+                adjusted[wi] = (w_intent, min(1.0, w_score + 0.15), w_matches)
+                adjusted[li] = (l_intent, max(0.0, l_score - 0.10), l_matches)
+                break  # one trigger per rule is enough
+
+    return adjusted
+
+
 class IntentRouter:
     """Maps a free-form prose prompt to one or more slash commands.
 
@@ -524,6 +643,13 @@ class IntentRouter:
 
         if not scores:
             return self._no_match_clarification(prose, lang)
+
+        # 2b. Disambiguation: compound phrase bonus + specificity boost.
+        # When a longer, more-specific intent keyword matches, boost that
+        # intent to resolve ambiguity (e.g. "health check" → DOCTOR wins
+        # over VERIFY's "check"; "test matrix" → RRI-T wins over VERIFY's
+        # "test"; "xem dashboard" → DASHBOARD wins over BUILD).
+        scores = _disambiguate(scores, text)
 
         # 3. Sort & decide.
         scores.sort(key=lambda x: x[1], reverse=True)
