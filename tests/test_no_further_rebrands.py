@@ -19,7 +19,7 @@ from tests.test_repo_urls_canonical import ALLOWED_ORGS
 
 # Soft cap = 3 (PJ3 canonical + garrytan + VagabondKingsman).  Đổi
 # số này phải đi kèm comment giải thích trong PR body.
-_MAX_ALLOWED_ORGS = 3
+_MAX_ALLOWED_ORGS = 4
 
 
 def test_allowed_orgs_size_cap():

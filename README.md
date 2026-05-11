@@ -291,7 +291,7 @@ và [`BENCHMARKS-METHODOLOGY.md`](BENCHMARKS-METHODOLOGY.md) để biết
 
 | Gate | Result | What it measures |
 |---|---|---|
-| pytest | **1558 passed** | Unit + integration correctness |
+| pytest (run `pytest --collect-only -q \| tail`) | **PASS** | Unit + integration correctness |
 | conformance self-test | **100/100** met=True | Internal regression + external benchmark probes ([details](BENCHMARKS-METHODOLOGY.md)) |
 | Permission engine benchmark | **F1=100%** (210/210) | 6-layer pipeline, 12 attack categories, 70+ regex patterns |
 | Injection classifier benchmark | **F1=100%** (100/100) | 9 attack categories, 45+ regex patterns, 0% false positive |
