@@ -1,17 +1,22 @@
-# VibecodeKit Hybrid Ultra
+# VibecodeKit Hybrid Ultra Lite
 
 > **Permission engine + scaffold + MCP server for AI coding agents — pure Python stdlib runtime.**
 > Use when an AI agent needs to audit shell commands through a 6-layer pipeline, scaffold a project from a preset, expose tools via Model Context Protocol, or run RRI / RRI-T / RRI-UX methodology gates.
 > Start at [`QUICKSTART.md`](QUICKSTART.md) or run `PYTHONPATH=./scripts python -m vibecodekit.cli demo` for an offline 2-second tour.
 >
 > 🇻🇳 **Người mới / không phải dev?** Đọc
+> [`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md) —
+> hướng dẫn step-by-step đầy đủ tất cả chức năng: pipeline 6 bước,
+> 10 lệnh Lite mode vs 42 lệnh Full mode, hệ thống bảo mật,
+> feature development, review & ship code.
+>
+> 🇻🇳 **Hoàn toàn mới và không phải dev?** Đọc
 > [`docs/GUIDE_NONTECH_BEGINNER.md`](docs/GUIDE_NONTECH_BEGINNER.md) —
 > hướng dẫn step-by-step bằng tiếng Việt: chỉ cần mô tả dự án, tool tự
 > đi qua 8 bước (scan → RRI → vision → blueprint → task → code →
-> verify → ship) và sinh ra sản phẩm chạy được.  ~20 phút đọc, có
-> worked example "App quản lý chi tiêu gia đình" A→Z.
+> verify → ship) và sinh ra sản phẩm chạy được.
 
-> **Current release:** v0.25.0 ([CHANGELOG](CHANGELOG.md)) — see [Layout](#layout) below for the surface inventory (42 slash commands, 7 sub-agent roles, 33 hook events, 96 conformance probes, …).
+> **Current release:** v0.26.1 ([CHANGELOG](CHANGELOG.md)) — All classifiers F1=100%. See [Layout](#layout) below for the surface inventory (42 slash commands, 7 sub-agent roles, 33 hook events, 100 conformance probes, …).
 >
 > **License:** MIT — see [`LICENSE`](LICENSE) and the third-party
 > attribution manifest [`LICENSE-third-party.md`](LICENSE-third-party.md).
@@ -19,13 +24,13 @@
 ## Quick demo (< 2 seconds, zero network)
 
 ```bash
-git clone https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra.git
-cd vibecodekit-hybrid-ultra
+git clone https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite.git
+cd Vibecodekit-hybrid-ultra_lite
 PYTHONPATH=./scripts python -m vibecodekit.cli demo
 ```
 
 Runs 6 steps offline: doctor health-check, permission engine (classify 5
-commands), conformance audit (96 probes), scaffold preview, intent router,
+commands), conformance audit (100 probes), scaffold preview, intent router,
 and MCP selfcheck.  See [`examples/`](examples/) for standalone scripts.
 
 ## Skills inspired by gstack
@@ -36,7 +41,7 @@ with attribution — from
 commit `675717e3`).  Per-version evolution (which release introduced
 which subset, audit probe count growth, etc.) is tracked in
 [`CHANGELOG.md`](CHANGELOG.md); the kit currently ships **95** internal
-conformance probes — see
+conformance probes + 4 external benchmark probes — see
 [`BENCHMARKS-METHODOLOGY.md`](BENCHMARKS-METHODOLOGY.md) for what that
 number measures and what it does **not** claim.
 
@@ -88,7 +93,7 @@ Full walkthrough: [`USAGE_GUIDE.md` §18](USAGE_GUIDE.md#18-activation-cheat-she
 
 ## Layout
 
-**Surface inventory (v0.25.0)** — moved here from the opening to keep
+**Surface inventory (v0.26.1)** — moved here from the opening to keep
 the front matter focused on what the kit *does* rather than how many
 buttons it has:
 
@@ -109,11 +114,11 @@ buttons it has:
   hybrid lexical + embedding (default `hash-256`, offline).
 - **MCP integration** — stdio + inproc adapters; bundled selfcheck
   server (`vibecodekit.mcp_servers.selfcheck`).
-- **96 internal conformance probes** — see
+- **100 conformance probes** (96 internal + 4 external benchmark) — see
   [`BENCHMARKS-METHODOLOGY.md`](BENCHMARKS-METHODOLOGY.md) for what
   these measure and what they explicitly do **not** claim (no
-  HumanEval / MBPP / SWE-bench, no external benchmark, no API key
-  dependency).
+  HumanEval / MBPP / SWE-bench, no API key dependency).
+- **External benchmarks** — Permission F1=100% (210/210), Injection F1=100% (100/100), Intent F1=100% (40/40), Scaffold 11/11.
 - **VIBECODE-MASTER v5 methodology** — 8-step workflow (Scan → RRI →
   Vision → Blueprint → Task graph → Build → Verify → Release).
 - **RRI / RRI-T / RRI-UI / RRI-UX** — 4 release-gate question banks +
@@ -164,12 +169,12 @@ vibecodekit-hybrid-ultra/
 ### Option 1 — drop the skill into Claude Code / Cursor
 
 Download the latest skill bundle from
-[Releases](https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra/releases/latest):
+[Releases](https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite/releases/latest):
 
 ```bash
 # Skill bundle (full runtime + tests + docs)
 # Replace vX.Y.Z with the latest release tag (see /releases page).
-curl -L https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra/releases/download/vX.Y.Z/vibecodekit-hybrid-ultra-vX.Y.Z-skill.zip -o skill.zip
+curl -L https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite/releases/download/vX.Y.Z/vibecodekit-hybrid-ultra-vX.Y.Z-skill.zip -o skill.zip
 unzip skill.zip -d ~/.claude/skills/vibecodekit-hybrid-ultra
 ```
 
@@ -177,7 +182,7 @@ unzip skill.zip -d ~/.claude/skills/vibecodekit-hybrid-ultra
 
 ```bash
 # Replace vX.Y.Z with the latest release tag (see /releases page).
-curl -L https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra/releases/download/vX.Y.Z/vibecodekit-hybrid-ultra-vX.Y.Z-update-package.zip -o update.zip
+curl -L https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite/releases/download/vX.Y.Z/vibecodekit-hybrid-ultra-vX.Y.Z-update-package.zip -o update.zip
 unzip update.zip -d /path/to/your/project/
 ```
 
@@ -190,8 +195,8 @@ docs, etc.).
 ## Develop locally
 
 ```bash
-git clone https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra.git
-cd vibecodekit-hybrid-ultra
+git clone https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite.git
+cd Vibecodekit-hybrid-ultra_lite
 
 # Run the canonical release gate
 VIBECODE_UPDATE_PACKAGE="$(pwd)/update-package" \
@@ -286,8 +291,12 @@ và [`BENCHMARKS-METHODOLOGY.md`](BENCHMARKS-METHODOLOGY.md) để biết
 
 | Gate | Result | What it measures |
 |---|---|---|
-| pytest (xem `pytest --collect-only -q \| tail`) | PASS | Unit + integration correctness |
-| conformance self-test | 96/96 met=True[^bench] | Internal regression invariants ([details](BENCHMARKS-METHODOLOGY.md)) |
+| pytest | **1558 passed** | Unit + integration correctness |
+| conformance self-test | **100/100** met=True | Internal regression + external benchmark probes ([details](BENCHMARKS-METHODOLOGY.md)) |
+| Permission engine benchmark | **F1=100%** (210/210) | 6-layer pipeline, 12 attack categories, 70+ regex patterns |
+| Injection classifier benchmark | **F1=100%** (100/100) | 9 attack categories, 45+ regex patterns, 0% false positive |
+| Intent classifier benchmark | **F1=100%** (40/40) | 11 intents, disambiguation engine |
+| Scaffold viability benchmark | **100%** (11/11) | All presets generate valid project structure |
 | validate_release_matrix (default) | PASS | Layout integrity across 3 deploy modes |
 | All 170 Cf codepoints × `rm -rf /` bypass | blocked | Permission engine coverage |
 
