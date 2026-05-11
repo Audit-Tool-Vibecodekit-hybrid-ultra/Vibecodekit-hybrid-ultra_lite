@@ -1,9 +1,13 @@
-# VibecodeKit Hybrid Ultra — 5-minute Quickstart
+# VibecodeKit Hybrid Ultra Lite — 5-minute Quickstart
 
 > Nếu bạn chưa biết bộ kit này là gì — nó là một **Agentic OS** cho các
 > CLI lập trình (ChatGPT, Claude Code / Claw Code, Codex, Cursor) giúp biến
-> một dự án "mơ hồ" thành một pipeline 8 bước đo được.  Bản này cho bạn
+> một dự án "mơ hồ" thành một pipeline 6 bước đo được.  Bản này cho bạn
 > khởi động trong 5 phút, không cần đọc hết 960 dòng `USAGE_GUIDE.md`.
+>
+> 🇻🇳 **Hướng dẫn sử dụng đầy đủ?** Đọc
+> [`docs/HUONG-DAN-SU-DUNG.md`](docs/HUONG-DAN-SU-DUNG.md) —
+> step-by-step tất cả chức năng, pipeline 6 bước, 10 lệnh Lite vs 42 Full.
 >
 > 🇻🇳 **Hoàn toàn mới và không phải dev?** Đọc
 > [`docs/GUIDE_NONTECH_BEGINNER.md`](docs/GUIDE_NONTECH_BEGINNER.md)

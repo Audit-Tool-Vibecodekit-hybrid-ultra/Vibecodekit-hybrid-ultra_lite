@@ -6,8 +6,8 @@ Standalone scripts demonstrating core VibecodeKit capabilities.
 ## Quick start
 
 ```bash
-git clone https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra.git
-cd vibecodekit-hybrid-ultra
+git clone https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite.git
+cd Vibecodekit-hybrid-ultra_lite
 
 # All-in-one demo (< 2 seconds):
 PYTHONPATH=./scripts python -m vibecodekit.cli demo

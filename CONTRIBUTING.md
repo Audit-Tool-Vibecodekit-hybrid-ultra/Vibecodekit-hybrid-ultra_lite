@@ -7,8 +7,8 @@ so PRs land smoothly.
 ## TL;DR
 
 ```bash
-git clone https://github.com/VibecodekitPJ7/vibecodekit-hybrid-ultra
-cd vibecodekit-hybrid-ultra
+git clone https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite.git
+cd Vibecodekit-hybrid-ultra_lite
 
 # Core (stdlib only, no third-party deps)
 PYTHONPATH=./scripts python3 -m pytest tests -q

@@ -62,7 +62,7 @@ Tools registered via `tools.json` chạy qua permission engine trước khi exec
 
 ## Canonical org
 
-Canonical org là `VibecodekitPJ7` từ v0.17.0+ (rebrand #9, **FINAL**).
+Canonical org là `Audit-Tool-Vibecodekit-hybrid-ultra` (lite fork).
 Drift guard hard-enforce trong CI — KHÔNG có env-gated bypass.  Xem
 `tests/test_repo_urls_canonical.py` cho lý do "dừng rebrand ở đây" và
 `tests/test_canonical_org_no_bypass.py` cho assert no-bypass invariant.
