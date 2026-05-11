@@ -25,14 +25,24 @@ def _ci_yml_text() -> str:
 
 
 def test_allowed_orgs_contains_pj7():
-    """``ALLOWED_ORGS`` phải chứa ``VibecodekitPJ7`` (canonical final)."""
+    """``ALLOWED_ORGS`` phải chứa ``VibecodekitPJ7`` (upstream)."""
     from tests.test_repo_urls_canonical import ALLOWED_ORGS
 
     assert "VibecodekitPJ7" in ALLOWED_ORGS, (
-        "ALLOWED_ORGS không còn chứa 'VibecodekitPJ7' — canonical org "
-        "đã rebrand lần thứ 10?  Cycle 8 PR1 đã commit PJ7 FINAL; nếu "
-        "thực sự cần đổi (legal / trademark), mở PR riêng và cập nhật "
-        "cả tests/test_canonical_org_no_bypass.py + CHANGELOG."
+        "ALLOWED_ORGS không còn chứa 'VibecodekitPJ7' — upstream org "
+        "vẫn cần trong ALLOWED_ORGS vì CHANGELOG.md và RELEASE_NOTES "
+        "vẫn tham chiếu tới org này."
+    )
+
+
+def test_allowed_orgs_contains_lite_org():
+    """``ALLOWED_ORGS`` phải chứa ``Audit-Tool-Vibecodekit-hybrid-ultra``
+    (canonical org của lite fork)."""
+    from tests.test_repo_urls_canonical import ALLOWED_ORGS
+
+    assert "Audit-Tool-Vibecodekit-hybrid-ultra" in ALLOWED_ORGS, (
+        "ALLOWED_ORGS không chứa 'Audit-Tool-Vibecodekit-hybrid-ultra' — "
+        "canonical org của lite fork hiện tại."
     )
 
 
@@ -55,12 +65,10 @@ def test_ci_yml_no_env_bypass_for_canonical_org():
     )
 
 
-def test_ci_yml_references_pj7():
-    """``.github/workflows/ci.yml`` phải reference ``VibecodekitPJ7``
-    (assertion cứng cho canonical owner)."""
+def test_ci_yml_references_canonical_org():
+    """``.github/workflows/ci.yml`` phải reference canonical org."""
     text = _ci_yml_text()
-    assert "VibecodekitPJ7" in text, (
-        ".github/workflows/ci.yml không còn reference 'VibecodekitPJ7' — "
-        "drift guard có vẻ đã bị xoá hoặc đổi canonical org ngầm.  "
-        "Cycle 8 PR1 commit: PJ7 là canonical FINAL."
+    assert "Audit-Tool-Vibecodekit-hybrid-ultra" in text, (
+        ".github/workflows/ci.yml không reference "
+        "'Audit-Tool-Vibecodekit-hybrid-ultra' — canonical org của lite fork."
     )

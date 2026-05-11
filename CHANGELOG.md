@@ -12,6 +12,38 @@ and [Semver](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.26.1] — 2026-05-11
+
+Lite fork audit release — all classifiers F1=100%, dead code cleanup,
+external benchmark validation, and lite mode (42→10 commands).
+
+- **Dead code cleanup:** Moved `query_loop.py` + `recovery_engine.py`
+  to `_standalone/`; backward-compat shims in place.
+- **External benchmarks:** Permission engine (210 attack commands),
+  injection classifier (100 prompts), intent classifier (40 golden),
+  scaffold viability (11 presets). All F1=100%.
+- **Lite mode:** 10 core commands for personal users
+  (`VIBECODEKIT_MODE=lite` or `--lite` flag). Install filters to
+  10 commands instead of 42.
+- **Permission engine:** +38 regex patterns covering 12 new attack
+  categories (disk destruction, fork bombs, network scanning,
+  credential access, log tampering, git destructive, system config,
+  exfiltration, Unicode escape, container escape, process debugging,
+  AWK system()).
+- **Injection classifier:** +45 regex patterns covering 9 attack
+  categories (override hijacking, HTML injection, malware requests,
+  data exfiltration, social engineering, embedded code, jailbreaks,
+  scanning, residual catch-all).
+- **Intent classifier:** +80 keywords, disambiguation engine with
+  4 rules resolving conflicts.
+- **Security fix:** Block `pip install -r /etc/shadow` sensitive-path
+  bypass; fix newline jailbreak regex matching.
+- **Documentation:** Vietnamese usage guide
+  (`docs/HUONG-DAN-SU-DUNG.md`), updated all repo URLs to
+  `Audit-Tool-Vibecodekit-hybrid-ultra` org.
+- **Conformance:** 100/100 probes (96 internal + 4 external benchmark).
+  29 legacy probes tagged with `--skip-legacy` / `--legacy` CLI flags.
+
 ## [0.25.0] — 2026-05-01
 
 Cycle 16 PR-E1 release — adds the **11th scaffold preset**

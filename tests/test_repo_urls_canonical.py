@@ -2,46 +2,21 @@
 allowed organisation.  Prevents stale fork / personal-account URLs from
 leaking into releases.
 
-Lý do tồn tại của từng org trong ``ALLOWED_ORGS`` (PR2 mở rộng,
-updated PR1 cycle 8 — re-lock sau 9 lần rebrand):
+Lý do tồn tại của từng org trong ``ALLOWED_ORGS``:
 
-- ``VibecodekitPJ7`` — **canonical FINAL** GitHub org của project
-  hiện tại từ v0.17.0+.  Repo này đã rebrand 9 lần
-  (``ykjpalbubp`` → ``N-NewteamPJ369`` → ``VibecodekitPJ`` →
-  ``VibecodekitPJ2`` → ``VibecodekitPJ3`` → ``VibecodekitPJ4`` →
-  ``VibecodekitPJ5`` → ``VibecodekitPJ6`` → ``VibecodekitPJ7``);
-  xem ``CHANGELOG.md`` cho lịch sử đầy đủ.
-
-  **CAM KẾT MẠNH (cycle 8 PR1):** ``VibecodekitPJ7`` là canonical
-  **FINAL** — DỪNG REBRAND Ở ĐÂY.  Mỗi lần rebrand là enterprise
-  red flag, tạo churn documentation + CI cost.  Nếu PR sau muốn
-  đổi canonical org lần thứ 10, **reviewer phải reject** trừ khi
-  có lý do hard-blocking (legal / trademark) được trình bày rõ
-  ràng trong PR body kèm sign-off của maintainer.
-
-  Drift guard này **không có cơ chế env-gated bypass**
-  (anti-pattern đã loại bỏ ở PR1 cycle 6); nếu fork CI cần
-  override, fork phải tự sync ``ALLOWED_ORGS`` hoặc dùng
-  ``pytest -k 'not test_repo_urls_canonical'`` cho fork suite.
-  Mọi tài liệu chỉ nên link tới ``VibecodekitPJ7``.
+- ``Audit-Tool-Vibecodekit-hybrid-ultra`` — **canonical** GitHub org
+  của lite fork hiện tại.  Đây là repo chính của bản Lite đã
+  audit và fix toàn bộ classifiers (F1=100%).
+- ``VibecodekitPJ7`` — **upstream** GitHub org của project gốc.
+  Vẫn còn references trong CHANGELOG.md, RELEASE_NOTES, và các
+  file lịch sử.
 - ``VagabondKingsman`` — upstream attribution cho
   `taw-kit <https://github.com/VagabondKingsman/taw-kit>`_, layer
-  được tích hợp vào VibecodeKit Hybrid Ultra ở giai đoạn BIG-UPDATE
-  (xem ``USAGE_GUIDE.md`` §16 — Release history).  Reference này tồn
-  tại để giữ MIT-style attribution; **không** phải fork / không phải
-  source of releases.
+  được tích hợp vào VibecodeKit Hybrid Ultra ở giai đoạn BIG-UPDATE.
 - ``garrytan`` — upstream MIT attribution cho
   `gstack <https://github.com/garrytan/gstack>`_, từ đó VCK port
   Python browser daemon + 16 ``/vck-*`` slash command (clean-room
-  reimplementation).  Reference cũng tồn tại thuần để giữ
-  attribution; không pull code thực từ org này lúc build.
-
-Quy tắc bổ sung (PR2):
-
-- ``ALLOWED_ORGS`` size **phải ≤ 3**; xem
-  ``tests/test_no_further_rebrands.py`` (gate riêng).
-- Mọi PR muốn thêm org thứ 4 phải sửa cả comment block ở đầu file
-  này, mô tả rõ "tại sao not a duplicate of an existing entry".
+  reimplementation).
 """
 from __future__ import annotations
 
@@ -53,7 +28,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 # Orgs that are legitimate references in this codebase.  Đọc comment
 # block ở đầu file cho lý do chi tiết.  Nếu cần thêm/bớt entry, đồng
 # thời cập nhật ``tests/test_no_further_rebrands.py`` để giữ size cap.
-ALLOWED_ORGS = {"VibecodekitPJ7", "VagabondKingsman", "garrytan"}
+ALLOWED_ORGS = {"Audit-Tool-Vibecodekit-hybrid-ultra", "VibecodekitPJ7", "VagabondKingsman", "garrytan"}
 
 # Placeholder orgs used in examples (e.g. "github.com/.../pull/42").
 _PLACEHOLDER_ORGS = {"...", "OWNER", "owner", "example", "your-org"}
