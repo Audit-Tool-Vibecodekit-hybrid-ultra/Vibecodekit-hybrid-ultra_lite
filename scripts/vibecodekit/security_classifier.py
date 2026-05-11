@@ -346,7 +346,7 @@ REGEX_PATTERNS: Tuple[RegexRule, ...] = (
     # (G) Newline-based jailbreaks (Human:/Assistant: injection)
     RegexRule("pi-human-assistant-inject",
               "prompt_injection",
-              r"(?s)\\n\\n(Human|User|System)\s*:\s*.{0,40}(ignore|secret|override|unrestricted|tell\s+me)",
+              r"(?s)(?:\\n\\n|\n\n)(Human|User|System)\s*:\s*.{0,40}(ignore|secret|override|unrestricted|tell\s+me)",
               "high"),
     # (H) Scanning / reconnaissance request in prose
     RegexRule("mal-scan-network",
