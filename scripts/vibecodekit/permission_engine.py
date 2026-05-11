@@ -595,11 +595,26 @@ _SAFE_PKG_INSTALL_RX = re.compile(
 )
 
 
+_SENSITIVE_PATH_RX = re.compile(
+    r"(/etc/(?:shadow|passwd|sudoers|ssl|pki|security)"
+    r"|~/?\.(ssh|gnupg|aws|kube|docker|config)"
+    r"|/proc/|/sys/|/dev/)"
+)
+
+
+_SAFE_KEYGEN_RX = re.compile(r"^\s*ssh-keygen\b", re.IGNORECASE)
+
+
 def _is_safe_pkg_install(cmd: str) -> bool:
     """True if *cmd* is a straightforward package install / key generation."""
     # Reject anything with shell metacharacters that could smuggle commands.
     if any(c in cmd for c in ";|&`$(<>"):
         return False
+    # ssh-keygen legitimately writes to ~/.ssh/ — exempt from path check.
+    if not _SAFE_KEYGEN_RX.match(cmd.strip()):
+        # Reject commands referencing sensitive system/user paths.
+        if _SENSITIVE_PATH_RX.search(cmd):
+            return False
     return bool(_SAFE_PKG_INSTALL_RX.match(cmd.strip()))
 
 
