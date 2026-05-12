@@ -1224,7 +1224,7 @@ vibe dashboard
 
 #### 19.3 `vibe audit`
 
-Chạy 96 conformance probe.  Default threshold = 0.85; release gate
+Chạy 100 conformance probe.  Default threshold = 0.85; release gate
 ở 1.0 (xem §25).
 
 ```bash
@@ -2010,7 +2010,7 @@ PYTHONPATH=./scripts pytest tests
 
 ```bash
 PYTHONPATH=./scripts python -m vibecodekit.conformance_audit --threshold 1.0
-# → parity: 100.00%   (96/96, threshold 100%)
+# → parity: 100.00%   (100/100, threshold 100%)
 ```
 
 ### 25.3 Gate 3 — release matrix L1+L2+L3
