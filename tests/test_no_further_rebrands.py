@@ -2,8 +2,9 @@
 
 VibecodeKit đã trải qua một chuỗi đổi tên / đổi org (PJ → PJ2 → PJ3 →
 mirror PJ4) cộng với 2 attribution upstream (``garrytan`` cho
-``gstack``, ``VagabondKingsman`` cho ``taw-kit``).  Tổng cộng **3**
-org là số tối đa hợp lý; mọi đề xuất thêm org thứ 4 phải:
+``gstack``, ``VagabondKingsman`` cho ``taw-kit``) và 1 lite fork
+(``Audit-Tool-Vibecodekit-hybrid-ultra``).  Tổng cộng **4**
+org là số tối đa hợp lý; mọi đề xuất thêm org thứ 5 phải:
 
 1. Mở PR riêng dành cho việc đổi canonical (không gộp với feature).
 2. Cập nhật comment block ở đầu ``tests/test_repo_urls_canonical.py``
@@ -17,7 +18,8 @@ from __future__ import annotations
 
 from tests.test_repo_urls_canonical import ALLOWED_ORGS
 
-# Soft cap = 3 (PJ3 canonical + garrytan + VagabondKingsman).  Đổi
+# Soft cap = 4 (Audit-Tool-Vibecodekit-hybrid-ultra canonical +
+# VibecodekitPJ7 upstream + garrytan + VagabondKingsman).  Đổi
 # số này phải đi kèm comment giải thích trong PR body.
 _MAX_ALLOWED_ORGS = 4
 
