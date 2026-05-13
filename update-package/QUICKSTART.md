@@ -54,7 +54,7 @@ export PYTHONPATH=~/.vibecode/vibecodekit-hybrid-ultra/scripts
 
 # 3. Test thử một lệnh
 python -m vibecodekit.cli audit
-# → kỳ vọng: 87/91 probes pass (internal self-test, not external benchmark)
+# → kỳ vọng: 100/100 probes pass (96 self-test + 4 external benchmark)
 ```
 
 Dùng `vibe rri-t reports/testing.jsonl` sau mỗi sprint để kiểm tra cổng

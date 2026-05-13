@@ -1,7 +1,7 @@
 # VibecodeKit Hybrid Ultra — Hướng dẫn sử dụng chi tiết (v0.26.1)
 
 Bộ kit đầy đủ để build dự án theo phương pháp **VIBECODE-MASTER** với **Full
-Agentic OS** runtime (100 internal conformance probes at v0.26.1 — self-test, not external benchmark; see `BENCHMARKS-METHODOLOGY.md`; all
+Agentic OS** runtime (100 conformance probes at v0.26.1 — 96 self-test + 4 external benchmark; see `BENCHMARKS-METHODOLOGY.md`; all
 actionable tests pass từ repo root; bundled `tests/` trong skill zip chứa
 một subset đại diện để user smoke-test sau khi extract — xem §15.10).
 Bản này ứng với **v0.26.1** (hiện hành — xem `CHANGELOG.md` cho
