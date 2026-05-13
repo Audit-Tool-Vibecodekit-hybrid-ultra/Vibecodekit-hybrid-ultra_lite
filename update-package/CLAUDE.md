@@ -36,7 +36,7 @@ the most-used subset for context.
 - `/vibe-compact [--reactive]` — 5-layer compaction
 - `/vibe-doctor`       — health check
 - `/vibe-dashboard`    — runtime event summary
-- `/vibe-audit`        — 96-probe internal conformance self-test ([methodology](BENCHMARKS-METHODOLOGY.md))
+- `/vibe-audit`        — 100-probe internal conformance self-test ([methodology](BENCHMARKS-METHODOLOGY.md))
 - `/vibe-install <dst>` — install overlay into another project
 
 CLI-only commands (no slash form):
