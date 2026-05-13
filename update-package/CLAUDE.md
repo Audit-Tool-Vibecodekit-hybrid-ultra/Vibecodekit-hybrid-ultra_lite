@@ -141,7 +141,7 @@ Before shipping:
    reports for the current commit).  Bundled `tests/` trong zip chỉ là
    subset đại diện; đủ để smoke-test sau khi unzip nhưng CI gate là trên
    full suite.
-2. `/vibe-audit` → 100/100 internal regression probes (self-test + external benchmarks)
+2. `/vibe-audit` → 100/100 internal regression probes (self-test, not external benchmark)
 3. `/vibe-rri-t` → all 7 dims ≥ 70 %, ≥ 5/7 @ ≥ 85 %, 0 P0 FAIL
 4. `/vibe-rri-ux` → same structure on Flow Physics
 5. `/vibe-vn-check` → gate PASS (12/12) if VN scope
