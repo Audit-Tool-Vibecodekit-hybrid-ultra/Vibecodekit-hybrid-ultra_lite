@@ -21,6 +21,22 @@
 > **License:** MIT — see [`LICENSE`](LICENSE) and the third-party
 > attribution manifest [`LICENSE-third-party.md`](LICENSE-third-party.md).
 
+## Devin-Native: Build projects without any IDE
+
+New Devin sessions can use VibecodeKit directly — no Claude Code, Cursor,
+or other IDE required:
+
+```bash
+git clone https://github.com/Audit-Tool-Vibecodekit-hybrid-ultra/Vibecodekit-hybrid-ultra_lite.git ~/vibecodekit-tool
+export PYTHONPATH=~/vibecodekit-tool/scripts
+python -m vibecodekit.cli build plan "Build a todo app with auth" --target ./my-app
+python -m vibecodekit.cli scaffold apply api-todo ./my-app --stack fastapi --force
+```
+
+See [`docs/DEVIN-NATIVE-SETUP.md`](docs/DEVIN-NATIVE-SETUP.md) for the
+full pipeline guide, or use the Devin skill at
+`.devin/skills/build-project/SKILL.md`.
+
 ## Quick demo (< 2 seconds, zero network)
 
 ```bash

@@ -707,6 +707,55 @@ def _cmd_refine(args: argparse.Namespace) -> int:
     raise SystemExit(f"unknown refine command: {args.refine_cmd}")
 
 
+def _cmd_build(args: argparse.Namespace) -> int:
+    """Devin-native project builder pipeline."""
+    from . import project_builder as pb
+
+    if args.build_cmd == "plan":
+        plan = pb.generate_plan(
+            args.description,
+            target_dir=args.target,
+            preset=getattr(args, "preset", None),
+            stack=getattr(args, "stack", None),
+        )
+        out = pb.plan_to_dict(plan)
+        if getattr(args, "verbose", False):
+            print(json.dumps(out, ensure_ascii=False, indent=2))
+        else:
+            print(f"Project: {out['description']}")
+            print(f"Preset:  {out['preset']} (stack: {out['stack']})")
+            print(f"Target:  {out['target_dir']}")
+            print(f"\nPipeline ({len(out['steps'])} steps):")
+            for s in out["steps"]:
+                print(f"  {s['number']}. {s['name']:<12s} → {s['output']}")
+            print(f"\nRun `vibe build step <name>` for detailed instructions.")
+        return 0
+
+    if args.build_cmd == "step":
+        text = pb.step_instructions(
+            args.step_name,
+            description=getattr(args, "description", "") or "",
+            preset=getattr(args, "preset", None) or "api-todo",
+            stack=getattr(args, "stack", None) or "fastapi",
+            target_dir=getattr(args, "target", ".") or ".",
+        )
+        print(text)
+        return 0
+
+    if args.build_cmd == "run":
+        result = pb.run_full_pipeline(
+            args.description,
+            target_dir=args.target,
+            preset=getattr(args, "preset", None),
+            stack=getattr(args, "stack", None),
+            vck_root=args.root,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+
+    raise SystemExit(f"unknown build command: {args.build_cmd}")
+
+
 def _cmd_benchmark(args: argparse.Namespace) -> int:
     """Run external validation benchmarks against real datasets."""
     from .external_benchmark import run_all
@@ -848,7 +897,7 @@ def main(argv=None) -> int:
                      "scaffold", "ship", "manifest", "refine", "verify",
                      "anti-patterns", "module", "context", "activate",
                      "team", "learn", "pipeline", "verb", "demo",
-                     "benchmark"):
+                     "benchmark", "build"):
         sub = sp.add_parser(cmd_name)
         sub.add_argument("--root", default=".")
         if cmd_name in ("run", "demo-run"):
@@ -1186,6 +1235,39 @@ def main(argv=None) -> int:
                              help="Run a specific benchmark (default: all).")
             sub.add_argument("--json", action="store_true")
             sub.set_defaults(fn=_cmd_benchmark)
+        elif cmd_name == "build":
+            sp2 = sub.add_subparsers(dest="build_cmd", required=True)
+            bp = sp2.add_parser("plan",
+                help="Generate a 6-step build plan from a project description.")
+            bp.add_argument("description",
+                help="Project description (e.g. 'Build a todo app with auth')")
+            bp.add_argument("--target", default="./project",
+                help="Target directory for the project (default: ./project)")
+            bp.add_argument("--preset", default=None,
+                help="Force a specific scaffold preset")
+            bp.add_argument("--stack", default=None,
+                help="Force a specific stack (nextjs/fastapi/expo)")
+            bp.add_argument("--verbose", action="store_true",
+                help="Print full JSON plan instead of summary")
+            bs = sp2.add_parser("step",
+                help="Get detailed instructions for a single pipeline step.")
+            bs.add_argument("step_name",
+                choices=["scan", "rri", "vision", "blueprint",
+                         "scaffold", "verify"],
+                help="Pipeline step name")
+            bs.add_argument("--description", default="",
+                help="Project description for context")
+            bs.add_argument("--preset", default=None)
+            bs.add_argument("--stack", default=None)
+            bs.add_argument("--target", default="./project")
+            br = sp2.add_parser("run",
+                help="Run full pipeline (generates plan + scaffold).")
+            br.add_argument("description",
+                help="Project description")
+            br.add_argument("--target", default="./project")
+            br.add_argument("--preset", default=None)
+            br.add_argument("--stack", default=None)
+            sub.set_defaults(fn=_cmd_build)
 
     ns = ap.parse_args(argv)
     return ns.fn(ns)
