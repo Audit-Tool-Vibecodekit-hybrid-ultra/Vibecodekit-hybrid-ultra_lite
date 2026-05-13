@@ -51,7 +51,7 @@ ca pytest tăng theo thời gian — chạy `pytest --collect-only -q | tail`
 để xem con số chính xác cho commit của bạn):
 
 - **pytest**: all actionable tests pass (số case tăng theo release; xem `CHANGELOG.md`)
-- **conformance self-test**: 100 / 100 regression probes pass[^bench] (96 self-test + 4 external benchmark; see `BENCHMARKS-METHODOLOGY.md`)
+- **conformance audit**: 100 / 100 regression probes pass[^bench] (96 self-test + 4 external benchmark; see `BENCHMARKS-METHODOLOGY.md`)
 - **fresh-extract self-test**: 96 / 100 probes pass
 - **integration tests**: 8 e2e + 3 UX + 6 version-sync
 
